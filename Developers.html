@@ -1,0 +1,164 @@
+
+
+<!doctype html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4. Development notes &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=532c1bf3" />
+    
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4.4.1. Fact Base" href="FactBase.html" />
+    <link rel="prev" title="3. Usage" href="usage.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="FactBase.html" title="4.4.1. Fact Base"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="3. Usage"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4. </span>Development notes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="development-notes">
+<h1><span class="section-number">4. </span>Development notes<a class="headerlink" href="#development-notes" title="Link to this heading">¶</a></h1>
+<section id="preparation">
+<h2><span class="section-number">4.1. </span>Preparation<a class="headerlink" href="#preparation" title="Link to this heading">¶</a></h2>
+<p>Currently no fully packaged version exists.</p>
+<p>The developer installation is therefore the same as user installation.</p>
+<ol class="arabic simple">
+<li><p>Use “git clone” on the “main” branch of <a class="reference external" href="https://github.com/JKucera-NCC/SmartDFM">https://github.com/JKucera-NCC/SmartDFM</a> . The main branch has the latest tested version.</p></li>
+<li><p>Set up the Python environment from sdc.yml.</p></li>
+<li><p>Basic graph neural network models (GNNs) are cloned with the repo, for alternative feature recognition algorthms please refer to <a class="reference internal" href="FeatureRecognition.html"><span class="doc">Feature Recognition</span></a>.</p></li>
+<li><p>For proper usage of SmartDFM composite definition will also have to be generated. The only composite definition currently integrated is the “layup definition” method, available at <a class="reference external" href="https://github.com/JKucera-NCC/LayupDefinition">https://github.com/JKucera-NCC/LayupDefinition</a>. For installation of this refer to the local documentation. [ref. the LD docs…]</p></li>
+</ol>
+</section>
+<section id="reworking-and-adding-rules">
+<h2><span class="section-number">4.2. </span>Reworking and adding rules<a class="headerlink" href="#reworking-and-adding-rules" title="Link to this heading">¶</a></h2>
+<p>To rework rules refer to annotations within the respective rules. Any changes should be reflected in the annotations. Refer to <a class="reference internal" href="RuleBase.html"><span class="doc">Rule Base</span></a> for rule template with all key aspects. It is good practice to keep local written up rule database that feeds into the Python implemented rules.</p>
+<p>Developers should have good overview of rules already implemented to avoid duplication or conflicts.</p>
+<p>When creating new rule developer should think about the information that feeds into the rule. If the pre-requisites to evaluating the rule are already defined in <a class="reference internal" href="FactBase.html"><span class="doc">Fact Base</span></a> and obtained through <a class="reference internal" href="PreBase.html"><span class="doc">Pre-Base</span></a>, the only development required is the rule itself. Otherwise additinal developments might be required.</p>
+</section>
+<section id="pre-rules-development">
+<h2><span class="section-number">4.3. </span>Pre-rules development<a class="headerlink" href="#pre-rules-development" title="Link to this heading">¶</a></h2>
+<p>The developments to pre_base.py are quite varied, but here are few points that should be followed:</p>
+<ul class="simple">
+<li><p>Highly complicated pre-rules should use external function. For example CAD related manipulation should be in step_utils.py, CATIA_utils.py, or equivalent for other software.</p></li>
+<li><p>Way to prevent re-run of the rule should be implemented.</p></li>
+<li><p>The run-time of the pre-rule should be considered; if run-time very high the cost vs benefit of the information obtained should be evaluated.</p></li>
+</ul>
+</section>
+<section id="components-of-the-system">
+<h2><span class="section-number">4.4. </span>components of the system<a class="headerlink" href="#components-of-the-system" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FactBase.html">4.4.1. Fact Base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PreBase.html">4.4.2. Pre-Base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RuleBase.html">4.4.3. Rule Base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FeatureRecognition.html">4.4.4. Feature Recognition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="InferenceEngine.html">4.4.5. Inference Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CATIA.html">4.4.6. CATIA</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">4. Development notes</a><ul>
+<li><a class="reference internal" href="#preparation">4.1. Preparation</a></li>
+<li><a class="reference internal" href="#reworking-and-adding-rules">4.2. Reworking and adding rules</a></li>
+<li><a class="reference internal" href="#pre-rules-development">4.3. Pre-rules development</a></li>
+<li><a class="reference internal" href="#components-of-the-system">4.4. components of the system</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="usage.html"
+                          title="previous chapter"><span class="section-number">3. </span>Usage</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="FactBase.html"
+                          title="next chapter"><span class="section-number">4.4.1. </span>Fact Base</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Developers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="FactBase.html" title="4.4.1. Fact Base"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="3. Usage"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4. </span>Development notes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

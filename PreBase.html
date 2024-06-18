@@ -1,0 +1,154 @@
+
+
+<!doctype html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4.4.2. Pre-Base &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=532c1bf3" />
+    
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4.4.3. Rule Base" href="RuleBase.html" />
+    <link rel="prev" title="Layup database" href="layup%20database.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="RuleBase.html" title="4.4.3. Rule Base"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="layup%20database.html" title="Layup database"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" accesskey="U"><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.2. </span>Pre-Base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pre-base">
+<h1><span class="section-number">4.4.2. </span>Pre-Base<a class="headerlink" href="#pre-base" title="Link to this heading">¶</a></h1>
+<p>pre_base.py is list of functions that help collect facts required for evaluation of rules (in Rule Base).</p>
+<p>This includes variety of smaller scripts, and references to larger applications such as the GNNs or step interogation script libraries.</p>
+<div class="highlight-python notranslate" id="target-to-code"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">pXX</span><span class="p">(</span><span class="n">FactBase</span><span class="p">):</span>
+        <span class="c1">#pXX serves as rough template for a pre-rule. This will not be executed. Only numbered rules are executed.</span>
+
+        <span class="c1">#Required variables (examples for various types:)</span>
+        <span class="n">tool_gender</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="s2">&quot;male&quot;</span><span class="p">)</span>
+        <span class="n">min_major_radii</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+        <span class="n">mmr_location</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+        <span class="n">layup_sections</span><span class="p">:</span> <span class="n">conlist</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">min_items</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#at least one object must exist in this list</span>
+        <span class="n">uniform_material</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+        <span class="c1">#Required variables are important for pre-rules as they dictate the order of pre-rule execution. Commonly pre-rule will</span>
+        <span class="c1">#have other pre-rules as pre-requisites, which this mechanism accomodates for.</span>
+
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">FactBase</span><span class="p">):</span>
+                <span class="bp">self</span> <span class="o">=</span> <span class="n">FactBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">d</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="c1">#Typically one overall if-statement should be included that prevents re-runs. Rules keep being checked for having</span>
+                <span class="c1">#pre-requisites, but to prevent re-running the same rules all the time it is crucial to identify a variable that</span>
+                <span class="c1">#only exists after rule has been successfully run once.</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layup_file</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1">#Main body can include whatever is required to obtain the required information.</span>
+
+                        <span class="c1">#If this is complex/complicated... the main bulk of code should be housed in dedicated script (e.g. CATIA_utils)</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">part_name</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span><span class="p">):</span>
+                                <span class="c1">#Don&#39;t forget to save the obtained information into the FactBase (self.)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">layup_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">part_name</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span>
+                                <span class="c1">#Important to add value ot .ite - this informs the overaching script that a rule has been run,</span>
+                                <span class="c1">#and FactBase has been adjusted.</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">ite</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                                <span class="c1">#Include reporting if it is suspected that lack of informaion might prevent this rule from running.</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">check_issues</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Layup file not found, make sure that .txt file with corresponding name is located in specified folder.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="c1">#print out for troubleshooting purposes</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pX run&quot;</span><span class="p">)</span>
+                <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="layup%20database.html"
+                          title="previous chapter">Layup database</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="RuleBase.html"
+                          title="next chapter"><span class="section-number">4.4.3. </span>Rule Base</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/PreBase.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="RuleBase.html" title="4.4.3. Rule Base"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="layup%20database.html" title="Layup database"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" ><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.2. </span>Pre-Base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

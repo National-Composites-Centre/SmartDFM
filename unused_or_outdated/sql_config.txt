@@ -1,0 +1,5 @@
+DIGIProps
+QNv8@AYq
+{ODBC Driver 17 for SQL Server}
+NCC-SQL-HA-02\APPS
+DIGIProps

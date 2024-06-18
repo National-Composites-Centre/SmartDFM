@@ -1,0 +1,12 @@
+untitled*
+__pycache__/
+dist*
+other*
+test*
+xxx*
+WS_2.0/votes*
+conversion.py
+edge.py
+temp/
+*.dist*
+unused_untracked*

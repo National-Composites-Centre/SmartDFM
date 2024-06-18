@@ -1,5 +1,8 @@
 
-#MAIN DOCUMENTATION NOW EXISTS IN /DOCS/BUILD/HTML - ALSO ACCESSIBLE VIA GitHub LINK
+Main documentation available at : https://national-composites-centre.github.io/SmartDFM/ .
+
+
+The below is a legacy Readme.
 
 
 # Introduction 

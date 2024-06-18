@@ -120,6 +120,7 @@ class p3(FactBase):
 
     def solve(self):
         #this takes the layup from file and turns it into list
+        print(self.max_ply_layup)
         if self.max_ply_layup == None:
             with open(self.path+self.part_name+".txt", "r") as text_file:
                 f = text_file.read()

@@ -1,6 +1,7 @@
 
-#MAIN DOCUMENTATION NOW EXISTS IN /DOCS/BUILD/HTML - ALSO ACCESSIBLE VIA GitHub LINK
+Main documentation available at : https://national-composites-centre.github.io/SmartDFM/ .
 
+The below is a legacy Readme.
 
 # Introduction 
 This repository supports the development of smart DFM design check. Along with the main DFM scripts it also

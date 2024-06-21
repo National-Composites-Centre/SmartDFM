@@ -18,6 +18,8 @@ Welcome to SmartDFM's documentation!
    Developers
    
    Contact
+   
+   Versions
 
 .. note::
 

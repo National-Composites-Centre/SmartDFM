@@ -1,4 +1,10 @@
 
+
+
+#THIS SCRIPT IS COMPLETELY UNUSED IN VERSION 3.0
+
+'''
+
 #backseat designer 1 works with Python only,
 #no KE or Expert system library has been used.
 
@@ -25,7 +31,7 @@ from pydantic import ValidationError
 
 import os
 
-version = str(1.1)
+
 
 #try: 
 CATIA = win32com.client.Dispatch("CATIA.Application")
@@ -123,12 +129,6 @@ class MainApp(App):
             except:
                 pass
 
-    
-
-
-        #THIS REQUIRES WAY OF PASSING THE INITIAL INPU (2 TEXT FIELDS) TO THE REST OF THE APP.... #ALSO NEEDS TO PROVIDE OUTPUT BACK - INTO THE APP DISPLAY.....
-
-
 
     def select(self,obj):
         print("(currently not functional, please edit folder manually)")
@@ -137,3 +137,4 @@ class MainApp(App):
 MainApp().run()
 
 
+'''

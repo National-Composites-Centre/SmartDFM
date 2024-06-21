@@ -2,18 +2,20 @@
 
 <!doctype html>
 
-<html lang="en" data-content_root="./">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>GNN usage/implementation &#8212; SmartDFM 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=532c1bf3" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
-    <script src="_static/documentation_options.js?v=f2a433a1"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -49,18 +51,18 @@
           <div class="body" role="main">
             
   <section id="gnn-usage-implementation">
-<h1>GNN usage/implementation<a class="headerlink" href="#gnn-usage-implementation" title="Link to this heading">¶</a></h1>
+<h1>GNN usage/implementation<a class="headerlink" href="#gnn-usage-implementation" title="Permalink to this heading">¶</a></h1>
 <p>Basic GNN models are currently provided with the main SmartDFM repository.</p>
 <section id="folder-structure">
-<h2>Folder structure<a class="headerlink" href="#folder-structure" title="Link to this heading">¶</a></h2>
+<h2>Folder structure<a class="headerlink" href="#folder-structure" title="Permalink to this heading">¶</a></h2>
 <p>The “WS_2.0” subfolder in the directory cointains all the configuration files and Python files required to use the GNN models. These are stored in further sub-folder called “models”. Each of the models contain a folder of multiple GNNs to increase robustness through voting mechanism.</p>
 </section>
 <section id="configuration-files">
-<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">¶</a></h2>
+<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">¶</a></h2>
 <p>Configuration files in “WS_2.0” are quite self explanatory. The key is to adjust the “model folder” field when any model is being replaced or added. This needs to be manually edited based on the location of the cloned library on users disc (to be improved). Each set of GNNs should have dedicated .ini config file.</p>
 </section>
 <section id="execution">
-<h2>Execution<a class="headerlink" href="#execution" title="Link to this heading">¶</a></h2>
+<h2>Execution<a class="headerlink" href="#execution" title="Permalink to this heading">¶</a></h2>
 <p>The models are used within the pre_base.py functions, through command line initiation of the following format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">run</span> <span class="o">-</span><span class="n">n</span> <span class="n">ws_pyg_42</span> <span class="n">python</span> <span class="p">[</span><span class="n">execution</span> <span class="n">location</span> <span class="n">path</span><span class="p">]</span> <span class="n">single_file_demonstrator</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">file_path</span> <span class="p">[</span><span class="n">part</span><span class="p">]</span> <span class="o">--</span><span class="n">out_path</span> <span class="p">[</span><span class="n">output</span> <span class="o">.</span><span class="n">csv</span> <span class="n">file</span><span class="p">]</span> <span class="o">--</span><span class="n">config_path</span> <span class="p">[</span><span class="n">configuration</span> <span class="n">file</span><span class="p">]</span>
 </pre></div>
@@ -69,11 +71,11 @@
 <p>If the user is using other than Anaconda Python environment manager the command needs to be adjusted accordingly.</p>
 </section>
 <section id="result-files">
-<h2>Result files<a class="headerlink" href="#result-files" title="Link to this heading">¶</a></h2>
+<h2>Result files<a class="headerlink" href="#result-files" title="Permalink to this heading">¶</a></h2>
 <p>Typically each GNN produces 3 .csv result files in “WS_2.0” folder, for example: votes_h.csv, votes_h_adj.csv, votes_h.csv . The “votes_h.csv” is the most important; column C-E represent xyz coordinates of each vertex, and column G denotes how many models predicted this vertex to be part of the feature in question (eg. hole). The “votes_h_adj.csv” is mostly used to understand some of the networks that have been created, as this file denotes neighbouring elements to any vertex considered.</p>
 </section>
 <section id="processing-results">
-<h2>Processing results<a class="headerlink" href="#processing-results" title="Link to this heading">¶</a></h2>
+<h2>Processing results<a class="headerlink" href="#processing-results" title="Permalink to this heading">¶</a></h2>
 <p>To understand the processing of the results it is recommended to read through the annotations in the pre-rules that deal with GNN execution, or even specific rules that use the results. The documentation is not maintained here as this will likely be subject of further development in near future.</p>
 </section>
 </section>
@@ -149,8 +151,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Jakub Kucera.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

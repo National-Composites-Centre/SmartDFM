@@ -2,18 +2,20 @@
 
 <!doctype html>
 
-<html lang="en" data-content_root="./">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>4. Development notes &#8212; SmartDFM 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=532c1bf3" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
-    <script src="_static/documentation_options.js?v=f2a433a1"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,26 +49,26 @@
           <div class="body" role="main">
             
   <section id="development-notes">
-<h1><span class="section-number">4. </span>Development notes<a class="headerlink" href="#development-notes" title="Link to this heading">¶</a></h1>
+<h1><span class="section-number">4. </span>Development notes<a class="headerlink" href="#development-notes" title="Permalink to this heading">¶</a></h1>
 <section id="preparation">
-<h2><span class="section-number">4.1. </span>Preparation<a class="headerlink" href="#preparation" title="Link to this heading">¶</a></h2>
+<h2><span class="section-number">4.1. </span>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <p>Currently no fully packaged version exists.</p>
 <p>The developer installation is therefore the same as user installation.</p>
 <ol class="arabic simple">
-<li><p>Use “git clone” on the “main” branch of <a class="reference external" href="https://github.com/JKucera-NCC/SmartDFM">https://github.com/JKucera-NCC/SmartDFM</a> . The main branch has the latest tested version.</p></li>
+<li><p>Use “git clone” on <a class="reference external" href="https://github.com/National-Composites-Centre/SmartDFM">https://github.com/National-Composites-Centre/SmartDFM</a> , to understand diefference between version and branches please navigate to <span class="xref std std-doc">Versiosn</span>. The main branch has the latest tested version.</p></li>
 <li><p>Set up the Python environment from sdc.yml.</p></li>
-<li><p>Basic graph neural network models (GNNs) are cloned with the repo, for alternative feature recognition algorthms please refer to <a class="reference internal" href="FeatureRecognition.html"><span class="doc">Feature Recognition</span></a>.</p></li>
-<li><p>For proper usage of SmartDFM composite definition will also have to be generated. The only composite definition currently integrated is the “layup definition” method, available at <a class="reference external" href="https://github.com/JKucera-NCC/LayupDefinition">https://github.com/JKucera-NCC/LayupDefinition</a>. For installation of this refer to the local documentation. [ref. the LD docs…]</p></li>
+<li><p>Basic graph neural network models (GNNs) are cloned with the repo. However, please refer to <a class="reference internal" href="GNN%20usage.html"><span class="doc">GNN usage/implementation</span></a> for setup. For alternative feature recognition algorthms please refer to <a class="reference internal" href="FeatureRecognition.html"><span class="doc">Feature Recognition</span></a>.</p></li>
+<li><p>For proper usage of SmartDFM composite definition will also have to be generated. The only composite definition currently integrated is the “layup definition” method, available at <a class="reference external" href="https://github.com/National-Composites-Centre/LayupDefinition">https://github.com/National-Composites-Centre/LayupDefinition</a>. For installation of this refer to the local documentation. [ref. the LD docs…]</p></li>
 </ol>
 </section>
 <section id="reworking-and-adding-rules">
-<h2><span class="section-number">4.2. </span>Reworking and adding rules<a class="headerlink" href="#reworking-and-adding-rules" title="Link to this heading">¶</a></h2>
+<h2><span class="section-number">4.2. </span>Reworking and adding rules<a class="headerlink" href="#reworking-and-adding-rules" title="Permalink to this heading">¶</a></h2>
 <p>To rework rules refer to annotations within the respective rules. Any changes should be reflected in the annotations. Refer to <a class="reference internal" href="RuleBase.html"><span class="doc">Rule Base</span></a> for rule template with all key aspects. It is good practice to keep local written up rule database that feeds into the Python implemented rules.</p>
 <p>Developers should have good overview of rules already implemented to avoid duplication or conflicts.</p>
 <p>When creating new rule developer should think about the information that feeds into the rule. If the pre-requisites to evaluating the rule are already defined in <a class="reference internal" href="FactBase.html"><span class="doc">Fact Base</span></a> and obtained through <a class="reference internal" href="PreBase.html"><span class="doc">Pre-Base</span></a>, the only development required is the rule itself. Otherwise additinal developments might be required.</p>
 </section>
 <section id="pre-rules-development">
-<h2><span class="section-number">4.3. </span>Pre-rules development<a class="headerlink" href="#pre-rules-development" title="Link to this heading">¶</a></h2>
+<h2><span class="section-number">4.3. </span>Pre-rules development<a class="headerlink" href="#pre-rules-development" title="Permalink to this heading">¶</a></h2>
 <p>The developments to pre_base.py are quite varied, but here are few points that should be followed:</p>
 <ul class="simple">
 <li><p>Highly complicated pre-rules should use external function. For example CAD related manipulation should be in step_utils.py, CATIA_utils.py, or equivalent for other software.</p></li>
@@ -75,7 +77,7 @@
 </ul>
 </section>
 <section id="components-of-the-system">
-<h2><span class="section-number">4.4. </span>components of the system<a class="headerlink" href="#components-of-the-system" title="Link to this heading">¶</a></h2>
+<h2><span class="section-number">4.4. </span>components of the system<a class="headerlink" href="#components-of-the-system" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="FactBase.html">4.4.1. Fact Base</a></li>
@@ -157,8 +159,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Jakub Kucera.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

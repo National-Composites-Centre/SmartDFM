@@ -870,7 +870,11 @@ class r402(FactBase):
 
     #required variables
     #materials in database require type column: GFRP/CFRP/....
-    layup_sections: conlist(object, min_length=1)
+
+
+    #layup_sections: conlist(object, min_length=1)
+
+    
     uniform_material: bool = Field()
 
     def __init__(self, d: FactBase):

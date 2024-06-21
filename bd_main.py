@@ -1,4 +1,10 @@
 
+
+
+#THIS SCRIPT IS COMPLETELY UNUSED IN VERSION 3.0
+
+'''
+
 #backseat designer 1 works with Python only,
 #no KE or Expert system library has been used.
 
@@ -19,166 +25,116 @@ import sys
 from pydantic import ValidationError
 
 #pysimplegui only used to initiate the run and print report
-import PySimpleGUI as sg
+#import PySimpleGUI as sg
+
+###
+
 import os
 
-version = str(1.1)
-
-try: 
-    CATIA = win32com.client.Dispatch("CATIA.Application")
-    partDocument2 = CATIA.ActiveDocument
-    cat_name = CATIA.ActiveDocument.Name
-    cat_name = cat_name.split(".CATPart")[0]
-except:
-    cat_name = ""
-
-s2 = 40
-s1 = 20
-layout2 = [[sg.Text('Layup file name:',size=(s1,1)),sg.InputText(cat_name, key='name',size=(s2, 1))],
-           [sg.Text("Select entire folder:",size=(s1,1)), sg.Input(key='-IN2-',size=(int(s2/3))),sg.FolderBrowse("Select",size=(int(s2/3),1))],
-           [sg.Button('Check my design',key='spl',size=(15,1)),sg.T('',size=(15, 1),key="xxx")],
-           [sg.Multiline( size=(400, 450),key='-INPUT0-')]]
 
 
-window = sg.Window('Design Check - SmartDFM '+version, layout2, default_element_size=(12,1),size=(430,480))
+#try: 
+CATIA = win32com.client.Dispatch("CATIA.Application")
+partDocument2 = CATIA.ActiveDocument
+cat_name = CATIA.ActiveDocument.Name
+cat_name = cat_name.split(".CATPart")[0]
+#except:
+#    cat_name = "Enter name here"
 
-#the exe will run in background (--noconsole), printing in general only for development and troubleshooting
-print("loading UI...")
 
-#GUI function loop
-while True: 
-    #read all potential user inputs
-    event, values = window.read()    
+#replacing PySimpleGUI by Kivy
+from kivy.app import App
+from kivy.uix.textinput import TextInput
+from kivy.uix.label import Label
+
+from kivy.uix.button import Button
+from kivy.uix.floatlayout import FloatLayout
+
+from kivy.core.window import Window
+from kivy.uix.scrollview import ScrollView
+
+import subprocess
+import os
+
+class MainApp(App):
+
+    Window.size = (500, 700)
+    def build(self):
+        self.layout = FloatLayout()
+
+        #txt input
+        self.lfn = TextInput(text=cat_name,size_hint=(0.75,0.05),pos =(120, 650))
+        #folder selection
+        self.sef = TextInput(text='C:\\code\\fls',size_hint=(0.4,0.05),pos =(160, 600))
+
+        self.b1 = Button(text='Select', on_press=self.select,size_hint=(0.20,0.05),pos =(380, 600))
+        self.b2 = Button(text='Check my design', on_press=self.submit,size_hint=(0.4,0.05),pos =(15,550))
+
+        self.l1 = Label(text='File name:',halign = 'left',pos =(5,650),size_hint = (0.2,0.05))
+
+        #This is to be resolved, the equivalent functionality to PySImpleGui not easily available
+        self.l2 = Label(text='Select folder (TBD!):',halign = 'left',pos =(10,600),size_hint=(0.3,0.05))
+
+        self.scrl = ScrollView(size_hint=(0.95, 0.75), pos =(10,10))
+        self.t3 = TextInput(text='xxxxxx\n',size_hint=(1,1))
+        self.scrl.add_widget(self.t3)
+
+        self.layout.add_widget(self.l1)
+        self.layout.add_widget(self.l2)
+        self.layout.add_widget(self.lfn)
+        self.layout.add_widget(self.sef)
+        self.layout.add_widget(self.b1)
+        self.layout.add_widget(self.b2)
+        self.layout.add_widget(self.scrl)
+        return(self.layout)
     
-    if event is None: # way out!    
-        break  
-    
-    if event in 'spl':
-        t1_start = perf_counter()
-
-        window['xxx'].Update('...Evaluating...')
-        #initiate fact class
-        d =  FactBase()
+    def submit(self,obj):
+        self.t3.text = "evaluating"
 
         #here UI to run with CATIA (or elsewhere)
-        d.version = version
-        d.part_name = values["name"]
-        ptemp = values['-IN2-']
-        ptemp = ptemp.replace("/","\\")+"\\"
-        d.path = ptemp
 
-        #d.path = "D:\\CoSinC_WP4.2\\TestCad\\X\\"
-        #d.part_name = "x_test_8"
+        part_name = self.lfn.text
+        part_folder = self.sef.text
+        pnf = part_name+"\n"+part_folder
 
-        #list of pre-processor functions that have to be run, as initial fact finding excercise
-        active_pre = [1,3,4,5,8,9,10,11,12,13,14,15,16] 
+        with open("temp_file.txt","w") as tfl:
+            tfl.write(pnf)
 
-        #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\MR_49_10.stp"
-        #d.step_file = "D:\\Kestrel\\conceptual outer pv\\c4\\bulkhead_c4_v0.stp"
-        #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\FL_19.stp"
-        #active_pre = [16]
 
-        #p6 too flexible - make it into two - one for angle, on for radius
+        #turn this into cmd....
 
-        #7 included in 4
+        #workaround because Kivy checks variables inside it's functions and prevents code that involves exec() from running ... effectively
+        #no more reasonable work-around found
+        #
 
-        #14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
+        try:
+            os.remove(part_folder+"\\"+part_name+"_report.txt")
+        except:
+            print("new report is being generated")
 
-        #these rules are numbered according ty Bryn's design rules document
-        active_rules =  [35,36,71,83,85,86,91,92,95,128,133,134,135,130,139,144,146,151,166,400,401,402]
 
-        #under construction: 400,401,402
+        #change location!!
+        subprocess.run("conda run -n sdc_kivy_3 python C:\\code\\smartdfm_kivy\\runSDFM.py") 
 
-        #78 temporarily disabled
 
-        #runs until rules dont make any change to fact base
-        #for now just run once....
 
-        #eventually control the running of rules through pydantic library only!!
+        error = 1
+        while error == 1:
+            
+            try:
+                print(part_folder+"\\"+part_name+"_report.txt")
+                with open(part_folder+"\\"+part_name+"_report.txt", "r") as report:
+                    self.t3.text = report.read()
+                error = 2
+            except:
+                pass
 
+
+    def select(self,obj):
+        print("(currently not functional, please edit folder manually)")
         
 
-        while d.ite > 0:
-            d.ite = 0
-            #store current version of d in dold
-            #dold = d.copy()
-
-            for i in active_pre:
-                if d.runtime_error != None:
-                    #error handling - displays error that made SmartDFM crash in place of the report
-                    d.report.design_errors = d.runtime_error
-                    d.report.warnings = ""
-                    d.report.suggested_checks = ""
-                    d.report.check_issues = ""
-                    d.ite = 0
-                    break 
-                    
-
-                #build function to execute - functions are named according to lists
-                build_func = "problem = pre_base.p"+str(i)+"(d)"
-                #print(build_func)
-                try:
-                    exec(build_func)
-                    d = problem.solve()
-                    #print("updated, here add some iterator to check when rules triggered")
-                except ValidationError as e:
-                    #print(e)
-                    p = 1
-            print("d.ite",d.ite)
-
-        #Rules running only once, rule results are text, should not affect the ability of other rules to be checked.
-        #temp:
-        if d.runtime_error == None:
-            for i in active_rules:
-                #build function to execute - functions are named according to lists
-                build_func = "problem = rule_base.r"+str(i)+"(d)"
-                print(build_func)
-                #Two levels of error handling, inner loop checks for missing information.
-                #Missing information is not technically an error, but intended method for 
-                #skipping rules that don't apply.
-                #Outter loop error handling actually covers for code errors in individual 
-                #rules.
-                try:
-                        #is this too brute force ?
-                    try:
-                        exec(build_func)
-                        d = problem.solve()
-                        #print("updated, here add some iterator to check when rules triggered")
-                    except ValidationError as e:
-                        #print(e)
-                        #print("Rule "+str(i)+" not checked")
-                        stre = "Rule "+str(i)+" not checked due to missing information."
-                        #consider printing some part of the actual error?
-                        d.report.check_issues += "\n"+stre +"\n"
-                except Exception as er:
-                    #print(er)
-                    #print("Rule "+str(i)+" not checked")
-                    stre = "Rule "+str(i)+" not checked due to DFM tool error."
-                    #consider printing some part of the actual error?
-                    d.report.check_issues += "\n"+stre +"\n"
-
-        #for i in d.layup_sections:
-        #    print(i.sequence)
-                    
-        t1_stop = perf_counter()
-        lapsed = t1_stop-t1_start
+MainApp().run()
 
 
-        total_report = d.report.design_errors +"\n"+d.report.warnings+"\n"+\
-                        d.report.suggested_checks+"\n"+d.report.check_issues+\
-                            "\n This report is also availble at "+d.path+" as a .txt file"+\
-                                "\n"+"\nSmartDFM "+d.version+"\n\n"+"Design was checked in "+str(lapsed)+" seconds."
-        window['-INPUT0-'].Update(total_report)
-        
-
-        #print(d.report.design_errors)
-        #print(d.report.warnings)
-        #print(d.report.suggested_checks)
-
-        f = open(d.path+d.part_name+"_report.txt", "a")
-        f.write(d.report.design_errors+d.report.warnings+d.report.suggested_checks+d.report.check_issues+"\n"+"\nSmartDFM "+d.version)
-        f.close()
-
-        window['xxx'].Update('')
-
-        #print(d.layup.sequence)
+'''

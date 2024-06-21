@@ -1,0 +1,10 @@
+name: sdc
+channels:
+  - defaults
+dependencies:
+  - pytorch
+  - pandas
+  - pywin32
+  - scipy
+  - pydantic
+prefix: C:\ProgramData\Anaconda3\envs\sdc

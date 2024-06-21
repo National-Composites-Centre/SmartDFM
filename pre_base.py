@@ -120,6 +120,7 @@ class p3(FactBase):
 
     def solve(self):
         #this takes the layup from file and turns it into list
+        print(self.max_ply_layup)
         if self.max_ply_layup == None:
             with open(self.path+self.part_name+".txt", "r") as text_file:
                 f = text_file.read()
@@ -345,13 +346,7 @@ class p4(FactBase):
             ttmax = 0
 
             mpl = self.max_ply_layup
-            #l2 is the list of 
-            #print(patches)
-            #for patch in patches:
-                #origin
-                #print("origin",patch[0].origin)
-                #number
-                #print("patch no",patch[0].patch)
+
             for ii, patch in enumerate(patches):
                 #reverse the order 
                 patch.sort(key=lambda x: x.sp_len, reverse=False)
@@ -470,10 +465,6 @@ class p4(FactBase):
         return(self)
 
 
-        #then I also have to check they overlap 
-        #for each spline check if it belongs to another bigger ... make separate branches where that is nto the case 
-        #use the sequence obtained above 
-
 class p5(FactBase):
     #finds the nearest distance between splines
 
@@ -576,15 +567,9 @@ class p5(FactBase):
                 #re-run of p5
                 self.layup_sections[i].mind = 0
 
-
             #print(mind)
             print("p5 run")
             self.ite += 1
-
-            #temp
-        
-
-
 
         return(self)
 
@@ -639,9 +624,6 @@ class p7(FactBase):
                 
             w = f.split("[MATERIALS]")[1]
             w = w.split("[SPLINES]")[0]
-
-            #establish SQL connection for mat ref
-            #cnnC,crrC = cnt_X('NCC')
 
             #SQL connection replaced by .txt database
             ttmax = 0

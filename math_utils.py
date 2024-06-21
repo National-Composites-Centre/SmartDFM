@@ -2,8 +2,6 @@
 import numpy as np
 import math
 
-
-
 def perpVectors(vector1, vector2):
     # this can produce two results!! .... control which one it creates???~~~~~~~~~~~~~~~~~~~~~~~~~
     vector3 = np.cross(vector1,vector2)
@@ -69,26 +67,6 @@ def GlobalToLocal(point1,point2,cSYS1,cSYS2,GCP):
     return(LCP)    
     #check that cross product works?
     
-
-#manual input option:    
-    
-#cSYS2 = np.array(([1,0,0],[0,-0.1,0.1],[0,0.1,0.1]))
-#point1 = np.array([0,0,0])
-#point2 = np.array([0,15,100])
-#GCP = np.array([10,20,120])
-#cSYS1 = np.array(([1,0,0],[0,1,0],[0,0,1]))
-#LCP = GlobalToLocal(point1,point2, cSYS1,cSYS2,GCP)
-#print(LCP)
-#print("Journey there...")
-# to return to original coordinates ==> recalculate reference points into the secondary system and rewerse the input order
-#point2 = GlobalToLocal(point1,point2, cSYS1,cSYS2,point1)
-#point1 = GlobalToLocal(point1,point2, cSYS1,cSYS2,point2)
-#invert the transformaiton vectors matrix 
-#cSYS2 = np.linalg.inv(cSYS2)
-#pass in tranformed points, inverted matrix, and the translated point in secondary coordinates
-#GCP = GlobalToLocal(point1,point2,cSYS1,cSYS2,LCP)
-#rint(GCP)    
-#print("...and back again")
     
 def orderByColumn(MATRIX,COLUMN,order):
     #This function sorts matrix by column.
@@ -141,7 +119,3 @@ def orderByColumn(MATRIX,COLUMN,order):
     return(ORDERED)
     
     
-#test
-#MATRIX = np.matrix([[1,2,3],[1,3,2],[1,53,23],[1,0.2,0.1],[13,32,13]])
-#COLUMN = 1
-#orderByColumn(MATRIX,COLUMN)

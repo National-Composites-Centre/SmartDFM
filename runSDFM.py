@@ -23,15 +23,6 @@ import os
 def sDFM(part,location):
 
     version = str(3.0)
-
-    #try: 
-    CATIA = win32com.client.Dispatch("CATIA.Application")
-    partDocument2 = CATIA.ActiveDocument
-    cat_name = CATIA.ActiveDocument.Name
-    cat_name = cat_name.split(".CATPart")[0]
-    #except:
-    #    cat_name = "Enter name here"
-
         
     t1_start = perf_counter()
 
@@ -41,13 +32,15 @@ def sDFM(part,location):
 
     #here UI to run with CATIA (or elsewhere)
     d.version = version
-    d.part_name = cat_name #self.lfn.text
-    ptemp = "C:\\code\\fls"#self.sef.text
+    d.part_name =  part #self.lfn.text
+    ptemp = location
     ptemp = ptemp.replace("/","\\")+"\\"
     d.path = ptemp
 
+    p = pre_base
 
-    active_pre = [1,3,4,5,8,9,10,11,12,13,14,15,16] 
+    #bit cured #TODO make this auto generate?
+    active_pre = [p.p1,p.p3,p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
 
     #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\MR_49_10.stp"
     #d.step_file = "D:\\Kestrel\\conceptual outer pv\\c4\\bulkhead_c4_v0.stp"
@@ -61,17 +54,13 @@ def sDFM(part,location):
     #14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
 
     #these rules are numbered according ty Bryn's design rules document
-    active_rules =  [35,36,71,83,85,86,91,92,95,128,133,134,135,130,139,144,146,151,166,400,401,402]
-
-    #under construction: 400,401,402
+    r = rule_base
+    active_rules =  [r.r35,r.r36,r.r71,r.r83,r.r85,r.r86,r.r91,r.r92,r.r95,r.r128,r.r133,r.r134,r.r135,r.r130,r.r139,r.r144,r.r146,r.r151,r.r166,r.r400,r.r401,r.r402]
 
     #78 temporarily disabled
 
     #runs until rules dont make any change to fact base
     #for now just run once....
-
-    #eventually control the running of rules through pydantic library only!!
-
 
     while d.ite > 0:
         d.ite = 0
@@ -88,16 +77,13 @@ def sDFM(part,location):
                 d.ite = 0
                 break 
                 
-
-            #build function to execute - functions are named according to lists
-            build_func = "problem = pre_base.p"+str(i)+"(d)"
-            print(build_func)
+            #pydantic validation errors will skip the pre-rule for now
             try:
-                exec(build_func)
-                d = problem.solve()
-                print("updated, here add some iterator to check when rules triggered")
+                d = i(d).solve()
+        
             except ValidationError as e:
-                print(e)
+                #print(e)
+                pass
             p = 1
         print("d.ite",d.ite)
 
@@ -106,8 +92,8 @@ def sDFM(part,location):
     if d.runtime_error == None:
         for i in active_rules:
             #build function to execute - functions are named according to lists
-            build_func = "problem = rule_base.r"+str(i)+"(d)"
-            print(build_func)
+            #build_func = "problem = rule_base.r"+str(i)+"(d)"
+            #print(build_func)
             #Two levels of error handling, inner loop checks for missing information.
             #Missing information is not technically an error, but intended method for 
             #skipping rules that don't apply.
@@ -117,13 +103,13 @@ def sDFM(part,location):
                     #is this too brute force ?
                 try:
 
-                    exec(build_func)
-                    d = problem.solve()
+                    #exec(build_func)
+                    d = i(d).solve()
                 #print("updated, here add some iterator to check when rules triggered")
             
                 except ValidationError as e:
 
-                    print(e)
+                    #print(e)
                     #print("Rule "+str(i)+" not checked")
                     stre = "Rule "+str(i)+" not checked due to missing information."
                     #consider printing some part of the actual error?

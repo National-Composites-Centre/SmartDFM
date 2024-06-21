@@ -31,11 +31,6 @@ def export_step(d):
 
     #looking for open file (without exceptions this time?)
     
-
-    #the try clause accounts for part already being open in CATIA
-    #(currently no check for it being the correct part is implemented)
-    #location of CATIA file
-    
     try: 
         #try clause checks if the currently open parts
         partDocument2 = CATIA.ActiveDocument
@@ -115,7 +110,6 @@ def export_step(d):
     body1.AppendHybridShape(pl) 
     ref4 = part1.CreateReferenceFromObject(pl)
 
-
     ii = 0
     #for each segment
     for s in d.layup_sections:
@@ -161,9 +155,6 @@ def export_step(d):
                 r6 = part1.CreateReferenceFromObject(hss1)
                 hss1.Name=s.sp_def.replace("+++","_")
                 part1.Update
-
-
-                #
 
                 print("under development")
             else:
@@ -266,7 +257,6 @@ def export_step(d):
 
     return(d)
 
-
 def hole_loc(part, path = ""):
     part_name = part
     part = path+part_name+".CATpart"
@@ -304,7 +294,6 @@ def hole_loc(part, path = ""):
         oop = False
         part1 = partDocument1.Part
 
-    
     #partDocument1 = CATIA.Documents.Open(part)
     #part1 = partDocument1.Part
     HSF1 = part1.HybridShapeFactory
@@ -351,8 +340,6 @@ def check_faces(FACES,CAD=[]):
     ShFactory = part1.HybridShapeFactory
     bodies1 = part1.HybridBodies
 
-    
-    
     for i , F in enumerate(FACES):
         bolX = F.bol
         
@@ -361,12 +348,10 @@ def check_faces(FACES,CAD=[]):
         # Naming new body as "wireframe"
         body1.Name="x"+str(i)+str(bolX)
         
-        
         x = float(F.edges[0].vertices[0].x)
         y = float(F.edges[0].vertices[0].y)
         z = float(F.edges[0].vertices[0].z)
         p = np.asarray([x,y,z])
-        
         
         point=ShFactory.AddNewPointCoord(p[0],p[1],p[2])
         body1.AppendHybridShape(point) 
@@ -399,8 +384,6 @@ def check_faces(FACES,CAD=[]):
         body1.AppendHybridShape(point) 
         ref4 = part1.CreateReferenceFromObject(point)
 
-
-
 def GNN_validation():
     #this projects points on current CATIA part, from specified excel
 
@@ -413,9 +396,7 @@ def GNN_validation():
     pts = []
     for i, line in enumerate(Lines1):
         if i != 0:
-
             votes = int(line.split(",")[6])
-
             if votes > 0:
                 #self.MajorRadius = True
                 x = float(line.split(",")[2])
@@ -438,11 +419,8 @@ def GNN_validation():
 
     body1 = bodies1.Add()
 
-
-
     #iterate adding points 
     for p in FL_points:
-
         point=ShFactory.AddNewPointCoord(p[0],p[1],p[2])
         body1.AppendHybridShape(point) 
         ref1 = part1.CreateReferenceFromObject(point)

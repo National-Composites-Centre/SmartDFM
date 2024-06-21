@@ -80,24 +80,5 @@ def pbp_solids(filename):
 
             i = i + 1
 
-        
-
-
 pbp_solids("D:\\CoSinC_WP4.2\\TestCad\\X\\x_test_4")
 
-#for each spline'
-
-    #for each spline point
-    
-    #find the if inside or ouside previous splines, sum of splines choses offset
-    #based on this find the offset on which to project the point
-
-
-    #transitions?? when next point on higher offset, change this point to average of previous and future
-
-
-    #experiment with fitting surface....
-
-
-
-    #adjust what the top layer is 

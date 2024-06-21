@@ -4,20 +4,14 @@ Created on Thu Jan 12 15:41:48 2023
 
 @author: jakub.kucera
 """
-
 import numpy as np
 import math
-
 
 #this set of functions help understand layup
 
 #the goal is to identify individual layup in all distinct regions
 
 #information such as stepped out drop-offs have to be addresesed
-
-#testing files:
-    #shrooms_layup_test
-    #cros_layup_test
 
 def stringToNumpy(strx):
     #Translates typical coordinates in .txt into numpy object.
@@ -38,7 +32,6 @@ def stringToNumpy(strx):
         
 def cross_over(layup_file):
     #returns number of intersections and positions
-    
     #variable for build up
     co = ""
     con = 0
@@ -95,7 +88,6 @@ def cross_over(layup_file):
                                 con += 1
                                 break
         
-
     #number of cross-overs collected initially
     cnt = co.count("\n")
     
@@ -160,13 +152,11 @@ def symmetry(lp):
 def balance(lp):
     #check if laminate is balanced
     
-    
     #use list
     u = np.asarray([])
     for i in lp:
         u = np.concatenate((u,np.asarray([int(i)])),axis=0)
     
-
     mau = int(max(u))
     miu = int(min(u))
 
@@ -222,7 +212,6 @@ def balance(lp):
                     ii = ii + 1
                 
                 i = i + 1
-        
         
         #to accomodate for any full degree definition 0.5 degree has to used 
         #to iterate -- for example [-12,3,24,39] is balanced around 13.5, which

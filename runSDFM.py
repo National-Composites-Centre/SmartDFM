@@ -40,7 +40,10 @@ def sDFM(part,location):
     p = pre_base
 
     #bit cured #TODO make this auto generate?
-    active_pre = [p.p1,p.p3,p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
+    #active_pre = [p.p1,p.p3,p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
+
+    #temp cut down
+    active_pre = [p.p1,p.p3,p.p4] #p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
 
     #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\MR_49_10.stp"
     #d.step_file = "D:\\Kestrel\\conceptual outer pv\\c4\\bulkhead_c4_v0.stp"

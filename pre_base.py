@@ -19,6 +19,10 @@ from step_features import hole_data, flange_data, MR_data
 from CATIA_utils import hole_loc, export_step
 from ED import ED
 
+import CompositeStandard
+
+from jsonic import deserialize
+
 #required to run WS through cmd
 import subprocess
 
@@ -107,76 +111,71 @@ class p2(FactBase):
             print("p2 run")
             self.ite += 1
         return(self)    
-
+    
 class p3(FactBase):
 
     #Required variables
     part_name: str = Field()
     path: str = Field()
-    layup_file: str = Field()
 
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
 
     def solve(self):
-        #this takes the layup from file and turns it into list
-        print(self.max_ply_layup)
-        if self.max_ply_layup == None:
-            with open(self.path+self.part_name+".txt", "r") as text_file:
-                f = text_file.read()
-                
-            w = f.split("[LAMINATE]")[1]
-            w = w.split("[MATERIALS]")[0]
-            ori = w.split('\n')[1]
-            ori = ori.replace("[","")
-            layup = ori.replace("]","")
-            layup = layup.replace(" ","")
 
-            if (layup == None) or (layup == ""):
-                self.runtime_error = "Layup is ill defined, please specify layers by numbers corresponding to orientation in degrees."
-                return(self)
-            else:
-                #it also forces all angles to be  between -90 and 90
-                l2 = []
-                for l in layup.split(",")[:]:
-                    #not sure why this is required, but....
-                    
-                    #to account for non-ASCII "-"
-                    if "-" in l:
-                        h = l.replace("-","")
-                        h = float(h)
-                        h = h *-1
-                    else:
-                        try:
-                            h = float(l)
-                        except:
-                            self.runtime_error = "Layup is ill defined, the values between ',' must be numbers only."
-                    
-                    #180deg shifts until the layup exits in correct range
-                    while h > 90:
-                        h = h -180
-                    while h < -90:
-                        h = h + 180
-                        
-                    #construct the return string of layer orientations
-                    l2.append(h)
+        if self.StandardLayup == None:
+            try:
+                #Open json file
+                with open(self.path+self.part_name+"_layup.json","r") as in_file:
+                    json_str= in_file.read()
+                #use jsonic library to turn into Python objects according to CompositeStandard
+                self.StandardLayup = deserialize(json_str,string_input=True)
+            except:
+                #for now insist on layup
+                if self.runtime_error == None:
+                    self.runtime_error = "Layup file not found, or not stored in correct standard."
+                else:
+                    self.runtime_error += "Layup file not found, or not stored in correct standard."
+                self.StandardLayup = CompositeStandard.CompositeDB(BaseModel) #empty layup when layup missing
 
-                self.max_ply_layup = l2
-                print("p3 run")
-                self.ite += 1
+            self.ite += 1  
+            print("p3 run")          
+
         return(self)
 
 class p4(FactBase):
+    #Required variables
+    StandardLayup: object = Field()
+
+    def __init__(self, d: FactBase):
+        self = FactBase.__init__(self, **d.__dict__)
+
+    def solve(self):
+        if self.max_ply_layup == None:
+            s = []
+            #assuming all plies from same stack - and ordered reasonably
+            for i in self.StandardLayup.allGeometry[:]:
+                if type(i) == type(CompositeStandard.Sequence()):
+                    for ii  in i.plies:
+                        s.append(ii.orientation)
+
+            self.max_ply_layup = s
+            self.ite += 1
+
+            print("p4 run")
+        return(self)
+
+class p5(FactBase):
     #calculate the numbers of segments with different layup and specify each layup
 
     #currently ignores cross-overs (implement layup-utils cross-over function later)
 
+    #for now works only with MAJOR layup in a JSON file
+
     #Required variables
-    part_name: str = Field()
-    path: str = Field()
-    layup_file: str = Field()
-    max_ply_layup: list = Field()
-    layup_splines: list = Field()
+    StandardLayup: object = Field()
+    max_ply_layup: list = Field() # is this truly needed? #TODO
+    
     #layup_splines: conlist(hole, min_length=1)
 
     #somehow check the layup already exists 
@@ -194,38 +193,41 @@ class p4(FactBase):
             with open(self.path+self.part_name+".txt", "r") as text_file:
                 f = text_file.read()
                 
-            w = f.split("[LAMINATE]")[1]
-            w = w.split("[MATERIALS]")[0]
-            ori = w.split('\n')[2]
-            ori = ori.replace("[","")
-            lp = ori.replace("]","")
+            #w = f.split("[LAMINATE]")[1]
+            #w = w.split("[MATERIALS]")[0]
+            #ori = w.split('\n')[2]
+            #ori = ori.replace("[","")
+            #lp = ori.replace("]","")
 
-            l2 = []
-            for l in lp.split(",")[:]:  
-                l2.append(l)
+            #l2 = []
+            #for l in lp.split(",")[:]:  
+            #    l2.append(l)
 
-            val, cnt = np.unique(l2, return_counts=True)
+            # L2 LIST OF SPLINES
+
+            #val, cnt = np.unique(l2, return_counts=True)
 
             #save edge spline
+            UniqueSplines = []
+            for i in self.StandardLayup.allGeometry[:]:
+                if type(i) == type(CompositeStandard.Spline()):
+                    UniqueSplines.append(i)
 
-            spe = f.split("[EDGE SPLINE]")[1]
-            spe = spe.split("\n\n")[0]
-            pt_list = np.asarray([[0,0,0]])
-            ln = 0
-            for n,ii in enumerate(spe.split("\n")):
+                    if i.memberName == 'edge':
+                        self.edge_points = i.points
+                        
+                        ln = 0
+                        for n, ii in enumerate(i.points):
+                            if n > 1:
+                                #addidnt the distance between neighbouring points
+                                ln = ln + math.sqrt((i.points[n].x-i.points[n-1].x)**2+
+                                                    (i.points[n].y-i.points[n-1].y)**2+
+                                                    (i.points[n].z-i.points[n-1].z)**2)
 
-                if n != 0:
-                    x = float(ii.split()[0])
-                    y = float(ii.split()[1])
-                    z = float(ii.split()[2])
+                        self.edge_len = ln #TODO delete this, should be sufficient within layup compo-standar
+                        i.length =ln
 
-                    pt_list = np.concatenate((pt_list, np.asarray([[x,y,z]])),axis=0)
-
-                if n > 1:
-                    ln = ln + math.sqrt((pt_list[n,0]-pt_list[n-1,0])**2+(pt_list[n,1]-pt_list[n-1,1])**2+(pt_list[n,2]-pt_list[n-1,2])**2)
-            pt_list = np.delete(pt_list, 0,axis=0)
-            self.edge_points = pt_list
-            self.edge_len = ln
+                        #is there a need for 'edge' to still be separate ? #TODO
 
 
             #print('val',val)
@@ -235,8 +237,8 @@ class p4(FactBase):
 
             self.layup_sections = []
             ptch = 0
-            for i in val:
-                if i != "'f'":
+            for i in UniqueSplines:
+                if i != "edge":
                     #print(i)
                     #collect list of points
                     #
@@ -395,7 +397,7 @@ class p4(FactBase):
                                                 fd = float(line.split(",")[8])
                                                 mu = line.split(",")[11]
                                 except:
-                                    self.runtime_error = "The current folder does not contain LD_layup_database.txt, this"\
+                                    self.runtime_error = "The current folder does not contain LD_layup_database.json, this"\
                                                         +" is currently required by the standard layup definition."
                                     return(self)
                                 #this should be checked, gettign correct thickness values?
@@ -455,7 +457,7 @@ class p4(FactBase):
             #if segments still empty, create a standalone single segment for the full layup
 
             #use the above to also find distance between any combination of patch splines?? 
-            print("p4 run")
+            print("p5 run")
 
             #not to forget database disconnect:
             #dc_X('NCC',cnnC,crrC)

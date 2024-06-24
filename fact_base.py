@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field, conlist
 import numpy as np
 from typing import Optional
 
+import CompositeStandard
+
 class vert(BaseModel):
     x: float = Field(None)
     y: float = Field(None)
@@ -9,8 +11,6 @@ class vert(BaseModel):
     ID: Optional[int] = Field(None)
     NeLi: Optional[list] = Field([]) # Neighbour list
     #min_dist: float = Field([]) #minimum found distance to another vertex on same hole
-
-
 
 class hole(BaseModel):
     #fits into "holes" list in main FactBase
@@ -26,9 +26,6 @@ class material(BaseModel):
     mat_name: str = Field(None) #identification of material as present in LD_layup_database.txt
     mat_type: str = Field(None) # GFRP/CFRP/...
     l_thick: Optional[float] = Field(None) #layer thickness
-
-
-    #potentially add other values from mat_database here when needed
 
 class layup(BaseModel):
 
@@ -61,7 +58,8 @@ class FactBase(BaseModel):
     This should list all possible facts in the fact base.
     Default values can be included.
     """
-    
+    StandardLayup: Optional[object] = Field(None)
+
     holes: Optional[list] = Field(None) #empty list of holes on default - is fitted with hole class
     layup_sections: Optional[list] = Field(None) #default value is empty class 
     max_ply_layup: Optional[list] = Field(None) #layup with all available plies included (drop-offs considred within layup-sectiosn)

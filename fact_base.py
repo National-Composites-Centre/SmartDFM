@@ -63,6 +63,7 @@ class FactBase(BaseModel):
     holes: Optional[list] = Field(None) #empty list of holes on default - is fitted with hole class
     layup_sections: Optional[list] = Field(None) #default value is empty class 
     max_ply_layup: Optional[list] = Field(None) #layup with all available plies included (drop-offs considred within layup-sectiosn)
+    all_relimitations: Optional[list] = Field(None)
     layup_file: Optional[str] = Field(None) #is layup file available?
     uniform_material: Optional[bool] = Field(None) # only one material used? True if yes
     material_u: Optional[object] = Field(None) #only for uniform materials

@@ -85,10 +85,18 @@ def export_step(d):
 
     # take average of edge-of-part spline
     for s in d.layup_sections:
-        if s.sp_def == "Edge of part":
-            xav = statistics.mean(s.pt_list[:,0])
-            yav = statistics.mean(s.pt_list[:,1])
-            zav = statistics.mean(s.pt_list[:,2])
+        if s.sp_def == "edge":
+            xt = 0
+            yt = 0
+            zt = 0
+            for pt in s.pt_list:
+                xt += pt.x
+                yt += pt.y
+                zt += pt.z
+
+            xav = xt/len(s.pt_list)
+            yav = yt/len(s.pt_list)
+            zav = zt/len(s.pt_list)
 
     #create the point
     point= HSF.AddNewPointCoord(xav,yav,zav)
@@ -116,16 +124,14 @@ def export_step(d):
 
         #split main surface according to spline and reference
         #if edge of part, use main surface
-        if s.sp_def != "Edge of part":
-            print(s.sp_def)
+        if s.sp_def != "edge":
+            print("EDGE IDENTIFIED")
             rr = str(s.sp_def)
-            print(rr)
             rr = rr.replace("'","")
-            print(s.pt_list)
-
+            print(rr)
             body6 = hybridBodies1.Item("gs2")
             hs6 = body6.HybridShapes
-
+            '''
             #accomodating for implicit zone drop-offs
             if "+++" in rr:
                 #create spline from points in new geometrical set
@@ -158,8 +164,9 @@ def export_step(d):
 
                 print("under development")
             else:
-                sp_ref = hs6.Item(rr)
-                r6 = part1.CreateReferenceFromObject(sp_ref)
+            '''
+            sp_ref = hs6.Item(rr)
+            r6 = part1.CreateReferenceFromObject(sp_ref)
 
             #project spline on plane
             proj = HSF.AddNewProject(r6, ref4)

@@ -43,7 +43,7 @@ def sDFM(part,location):
     #active_pre = [p.p1,p.p3,p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
 
     #temp cut down
-    active_pre = [p.p1,p.p3,p.p4] #p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
+    active_pre = [p.p1,p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
 
     #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\MR_49_10.stp"
     #d.step_file = "D:\\Kestrel\\conceptual outer pv\\c4\\bulkhead_c4_v0.stp"
@@ -51,8 +51,6 @@ def sDFM(part,location):
     #active_pre = [16]
 
     #p6 too flexible - make it into two - one for angle, on for radius
-
-    #7 included in 4
 
     #14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
 
@@ -142,7 +140,7 @@ def sDFM(part,location):
     print(d.report.warnings)
     print(d.report.suggested_checks)
 
-    f = open(d.path+d.part_name+"_report.txt", "a")
+    f = open(d.path+d.part_name+"_report.txt", "w")
     f.write(d.report.design_errors+d.report.warnings+d.report.suggested_checks+d.report.check_issues+"\n"+"\nSmartDFM "+d.version)
     f.close()
 

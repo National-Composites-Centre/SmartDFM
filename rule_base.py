@@ -615,13 +615,13 @@ class r128(FactBase):
                 i = 0
                 while i < np.size(ls.pt_list,0):
                     #if any point on any spline is closer than radius from hole mid-point it is likely ply is being terminated at fastener location
-                    dist = math.sqrt((h.position[0]-ls.pt_list[i,0])**2+(h.position[1]-ls.pt_list[i,1])**2+(h.position[2]-ls.pt_list[i,2])**2)
+                    dist = math.sqrt((h.position[0]-ls.pt_list[i].x)**2+(h.position[1]-ls.pt_list[i].y)**2+(h.position[2]-ls.pt_list[i].z)**2)
                     #1% larger hole for corner drop-offs
                     if dist < h.radius*1.01:
-                        print(h.radius)
-                        print(dist)
-                        print(h.position)
-                        print(ls.pt_list[i,:])
+                        #print(h.radius)
+                        #print(dist)
+                        #print(h.position)
+                        #print(ls.pt_list[i,:])
                         stre = "Never terminate plies in fastener patterns.\n"
                         stre += "Spline "+str(ls.sp_def)+ " crosses through hole located at : "+str(h.position)+".\n"
                         #avoid duplication
@@ -763,7 +763,7 @@ class r139(FactBase):
                     dif = abs(c2-c1)
 
                     if dif > 0.38:
-                        stre = "Drop-off at one location should not 0.38mm."
+                        stre = "Drop-off at one location should not exceed 0.38mm."
                         stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
                         #suggested check as it is minor once balance and symmetry has been considered 
                         #avoid duplication

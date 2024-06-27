@@ -4,6 +4,8 @@ from typing import Optional
 
 import CompositeStandard
 
+#Some of the classes below might be obsolete due to usage of CompositeStandard which houses many of these variables
+
 class vert(BaseModel):
     x: float = Field(None)
     y: float = Field(None)

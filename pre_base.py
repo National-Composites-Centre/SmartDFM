@@ -67,25 +67,6 @@ class pXX(FactBase):
             print("pX run")
         return(self)
 
-class p1(FactBase):
-    #checks if layup file exists
-
-    #Required variables
-    part_name: str = Field()
-    path: str = Field()
-
-    def __init__(self, d: FactBase):
-        self = FactBase.__init__(self, **d.__dict__)
-
-    def solve(self):
-        if self.layup_file == None:
-            if os.path.exists(self.path+self.part_name+".txt"):
-                self.layup_file = self.path+self.part_name+".txt"
-                self.ite += 1
-            else:
-                self.report.check_issues += "\nLayup file not found, make sure that .txt file with corresponding name is located in specified folder.\n"
-            print("p1 run")
-        return(self)
 
 class p2(FactBase):
     #Variables to be obtained
@@ -217,7 +198,7 @@ class p5(FactBase):
                         i.length =ln
 
                         #is there a need for 'edge' to still be separate ? #TODO
-
+            self.layup_splines = UniqueSplines
             #pathces allows for number of groups for drop-ffs
             #inside of each patch, sits list of splines (when cross overs come, it is going to be spline amalgamations)
             patches = [[]]
@@ -870,6 +851,7 @@ class p12(FactBase):
         return(self)
     
 class p13(FactBase):
+    #Currently done as part of p5 
 
     #Required variables
     part_name: str = Field()

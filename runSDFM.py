@@ -22,7 +22,7 @@ import os
 
 def sDFM(part,location):
 
-    version = str(4.1)
+    version = str(4.2)
         
     t1_start = perf_counter()
 
@@ -40,11 +40,15 @@ def sDFM(part,location):
     p = pre_base
 
     #bit cured #TODO make this auto generate?
-    active_pre = [p.p1,p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
+    active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p9,p.p10,p.p11,p.p12,p.p14,p.p15,p.p16] 
+
+    #p1 and p2 removed at 4.1 - layup file and step files checked when first pre-rule requires them instead
 
     #TODO p6 too flexible - make it into two - one for angle, on for radius
 
     #TODO 14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
+
+    #p13 currently done under p5
 
     #these rules are numbered according ty Bryn's design rules document
     r = rule_base

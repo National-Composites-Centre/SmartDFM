@@ -1,0 +1,160 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>GNN Training &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Alternatives to GNNs" href="Alternatives%20to%20GNNs.html" />
+    <link rel="prev" title="GNN usage/implementation" href="GNN%20usage.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Alternatives%20to%20GNNs.html" title="Alternatives to GNNs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="GNN%20usage.html" title="GNN usage/implementation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" ><span class="section-number">4. </span>Development notes</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="FeatureRecognition.html" accesskey="U"><span class="section-number">4.4.4. </span>Feature Recognition</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GNN Training</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="gnn-training">
+<h1>GNN Training<a class="headerlink" href="#gnn-training" title="Permalink to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p>The goal is to create maximum variation in example parts while mainitainig clear idea what the training feature is supposed to look like.</p>
+<p>Originally, large dataset was created for training of multiple features. However, that would requir extreme flexibility of the script to do for parts representative of real enginerring solutions. Therefore the approch was changed to trining for specific feature. Every node is binary: either it corresponds to trained feature, or it doesn’t. This requires larger datasets, but the datasets are easier to create with sufficient relevant variation.</p>
+<p>The code for the training datast generation is stored in cad_generation sub-folder of this repository.</p>
+</section>
+<section id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this heading">¶</a></h2>
+<p>The metadate identifies nodes corresponding to the feature of interest(show example).</p>
+<p>Usually the nodes are identified by comparing .stp file of part without the feature implemented and the .stp file with the feature in place. This is not bulletproof as some nodes generated are very specific and might not be good representation of the feature. However, that is very rare occurance according to current experience.</p>
+</section>
+<section id="cad-generation">
+<h2>CAD generation<a class="headerlink" href="#cad-generation" title="Permalink to this heading">¶</a></h2>
+<p>CAD generation scripts are available in “cad_generation” sub-folder. The general script components are listed below:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>the standard components</dt><dd><ul>
+<li><p>call catia</p></li>
+<li><p>create part without feature</p></li>
+<li><p>save and save points</p></li>
+<li><p>create feature</p></li>
+<li><p>compare points</p></li>
+<li><p>save + metadata</p></li>
+<li><p>method for keeping the iteration running through error handling when issues arrise</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GNN Training</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#metadata">Metadata</a></li>
+<li><a class="reference internal" href="#cad-generation">CAD generation</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="GNN%20usage.html"
+                          title="previous chapter">GNN usage/implementation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="Alternatives%20to%20GNNs.html"
+                          title="next chapter">Alternatives to GNNs</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GNN Training.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Alternatives%20to%20GNNs.html" title="Alternatives to GNNs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="GNN%20usage.html" title="GNN usage/implementation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" ><span class="section-number">4. </span>Development notes</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="FeatureRecognition.html" ><span class="section-number">4.4.4. </span>Feature Recognition</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GNN Training</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

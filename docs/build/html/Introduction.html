@@ -1,0 +1,134 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>1. Introduction &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Usage" href="usage.html" />
+    <link rel="prev" title="Welcome to SmartDFM’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="3. Usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SmartDFM’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Introduction</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="introduction">
+<h1><span class="section-number">1. </span>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h1>
+<p>SmartDFM application aims to deliver immediate design feedback to a CAD engineer. The application can be integrated in CAD system (currently demonstrated in CATIA). Upon initiating it compares a rules database with information available about the part design: shape, size, materials, layup… Based on the rules flagged a report is generated to support the engineer in making further improvements to the design.</p>
+<p>The diagram below outlines the main components of the application:</p>
+<img alt="_images/SmartDFM_42.PNG" src="_images/SmartDFM_42.PNG" />
+<p>The boxes titled “PREDEFINED” correspond to the rule database. These are design rules collected from design guideline documents and from experts directly. These rules are relted to laminate design, general modelling, assembly, material considerations, metrology, etc… For the demonstrator limited selection of design rules was taken from NCC’s rule database. NCC’s rule database is an intelectual property of NCC and hence is not shared in full. For more information find appropriate contact in <a class="reference internal" href="Contact.html"><span class="doc">Contact</span></a> section.</p>
+<p>The “AT RUNTIME” boxes interogate currently available files to obtain any information relevant for evaluation of the rules. Currently two files are typically evaluated: .step file describing the part itself, and “layup file” - standardised description of layup refering to CAD geometries for precision. There are many individual scripts that support this, the green boxes only highlight the most notable aspects; these have dedicated sections elsewhere in the documentation.</p>
+<p>Inference engine is essentially a structure of funcitons and classes designed for easy comparion of facts and rules. Facts being the information collected about part, and rules being standardised Python implementation of selected rules from rule database.</p>
+</section>
+<section id="why-smartdfm">
+<h1><span class="section-number">2. </span>Why SmartDFM?<a class="headerlink" href="#why-smartdfm" title="Permalink to this heading">¶</a></h1>
+<p>There are commercial software that aspire towards similar goals. However, this should not be seen as a standalone software, but rather as a demonstrator template. Every company will have slightly different rules of design, every company will work with different manufactuirng processes, etc, etc… This tool is highly modular and allows for relatively easy implementation of bespoke rules.</p>
+<p>The pre-rules, i.e. collection of information from CAD, tends to be more difficult. Author’s (far-fetched) hope is that with many people building their own tools to obtain attributes of interest from their CAD, we could eventually build a strong library of plug-and play modules that everyone could use for their implementation of SmartDFM.</p>
+<p>Initially, the demonstrator version is done with CATIA environemnt in use. However, this can also be easily switched for any other scriptable CAD package. Some script will need adjusting, but due to the modularity of FactBase, RuleBase and Prebase the developments required should be minimal.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">1. Introduction</a></li>
+<li><a class="reference internal" href="#why-smartdfm">2. Why SmartDFM?</a></li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to SmartDFM’s documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="usage.html"
+                          title="next chapter"><span class="section-number">3. </span>Usage</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="3. Usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SmartDFM’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Introduction</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

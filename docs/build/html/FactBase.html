@@ -1,0 +1,291 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4.4.1. Fact Base &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Layup database" href="layup%20database.html" />
+    <link rel="prev" title="4. Development notes" href="Developers.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="layup%20database.html" title="Layup database"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Developers.html" title="4. Development notes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" accesskey="U"><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.1. </span>Fact Base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="fact-base">
+<h1><span class="section-number">4.4.1. </span>Fact Base<a class="headerlink" href="#fact-base" title="Permalink to this heading">¶</a></h1>
+<p>Fact base serves as overall storage of variables and references for a part in question. The existence, or non-existence, of information in the FactBase class informs which pre-rules and rules need to be executed.</p>
+<p>The pre-rules focus on updating the FactBase using various mechanisms.</p>
+<p>The rules use the FactBase to verify which of the parameters are in conflict with the rules.</p>
+<p>The class uses Pydantic definition, which facilitates the rules execution, details are described in <a class="reference internal" href="InferenceEngine.html"><span class="doc">Inference Engine</span></a></p>
+<section id="usage-and-parameters">
+<h2>Usage and parameters<a class="headerlink" href="#usage-and-parameters" title="Permalink to this heading">¶</a></h2>
+<p>fact_base.py includes information on what most variables represent</p>
+<p>To create a default list of variables, stored in Pydantic class: <code class="docutils literal notranslate"><span class="pre">fact_base.FactBase</span></code> :</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.FactBase">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">FactBase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.FactBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>This should list all possible facts in the fact base. For default values see the fact_base.py directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>holes</strong> – list - the holes list contains list containing “hole” class members</p></li>
+<li><p><strong>layup_sections</strong> – list - list of “layup_section” objects</p></li>
+<li><p><strong>max_ply_layup</strong> – list - layup with all available plies included (drop-offs considred within layup-sectiosn)</p></li>
+<li><p><strong>layup_file</strong> – str - location of layup file if available</p></li>
+<li><p><strong>uniform_material</strong> – bool - only one material used? True if yes</p></li>
+<li><p><strong>material_u</strong> – object - only for uniform materials</p></li>
+<li><p><strong>step_file</strong> – str - step file path</p></li>
+<li><p><strong>load_direction</strong> – list - [x,y,z] vector (CURRENTLY NOT USED - relevant rules yet to be implemented)</p></li>
+<li><p><strong>edge_points</strong> – object - all spline points for the edge</p></li>
+<li><p><strong>edge_len</strong> – float - lenght of the ege spline</p></li>
+<li><p><strong>tool_gender</strong> – str - male or female tool (only “male” and “female” accepted)</p></li>
+<li><p><strong>MR_points</strong> – list - list of 3d points from WS that correspond to major radii</p></li>
+<li><p><strong>FL_points</strong> – list - list of points relevant to fillets (from WS)</p></li>
+<li><p><strong>min_major_radii</strong> – float - this is the smallest of major radii</p></li>
+<li><p><strong>mmr_location</strong> – object - position of min_major_radius</p></li>
+<li><p><strong>MR_list</strong> – list - list of Major Radii</p></li>
+<li><p><strong>layup_max_thickness</strong> – float - The maximum thickness of laminate anywhere on the part.</p></li>
+<li><p><strong>major_shape_angle</strong> – float - for now just flange angle, but will include any sharp geometry changes</p></li>
+</ul>
+</dd>
+</dl>
+<p>The output report is a string for now</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>report</strong> – object - Field(report())</p></li>
+<li><p><strong>runtime_error</strong> – str - Field(None)</p></li>
+</ul>
+</dd>
+</dl>
+<p>For reference:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>version</strong> – str - version of SmartDFM tool</p></li>
+<li><p><strong>part_name</strong> – str - make this unique identifier when storage sorted?</p></li>
+<li><p><strong>path</strong> – str - full path to the main run directory</p></li>
+<li><p><strong>ite</strong> – int</p></li>
+</ul>
+</dd>
+</dl>
+<p>Right now the below is manually edited, it should be replaced by GNN plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flange</strong> – bool - Field(None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.vert">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">vert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.vert" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – float</p></li>
+<li><p><strong>y</strong> – float</p></li>
+<li><p><strong>z</strong> – float</p></li>
+<li><p><strong>ID</strong> – int</p></li>
+<li><p><strong>NeLi</strong> – list - list of neighbouring vertices (connected by some form of line/curve)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.hole">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">hole</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.hole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specialised class to hold information about individual hole.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> – float - describing the radius of the main portion of the hole</p></li>
+<li><p><strong>type</strong> – str - destribes the type of hole, currently only “through_simple” type is used, but more types should be introduced</p></li>
+<li><p><strong>position</strong> – object - 1:3 numpy array consisting x-y-z coordinates of the hole</p></li>
+<li><p><strong>direction</strong> – object - 1:3 numpy array consisting of x-y-z vector</p></li>
+<li><p><strong>edge_distance</strong> – float - calculated distance from hole to nearest part edge_distance</p></li>
+<li><p><strong>vert_list</strong> – list - list of vertices identified as part of this hole’s definition (x-y-z coordinates for each)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.material">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">material</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.material" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat_name</strong> – str  - reference name for material in <a class="reference internal" href="layup%20database.html"><span class="doc">Layup database</span></a></p></li>
+<li><p><strong>mat_type</strong> – str  - type of material as taken from <a class="reference internal" href="layup%20database.html"><span class="doc">Layup database</span></a>, eg.: GFRP,CFRP…</p></li>
+<li><p><strong>l_thick</strong> – float - layer thickness in mm</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.layup">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">layup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.layup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class should contain all details regarding layup in specific area delimted by defined spline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>balanced</strong> – bool - True/False , is laminate balanced?</p></li>
+<li><p><strong>symmetric</strong> – bool - True/False, is laminate symmetric? (This does not duplicate the layup, it is simply an observation on details contained in ‘sequence’)</p></li>
+<li><p><strong>sequence</strong> – list - simple list of layer primary orientations, should contain all layers. The values should be floats expressed in degrees from -90 to 90.</p></li>
+<li><p><strong>sp_def</strong> – str - reference name for delimiting spline from CAD system</p></li>
+<li><p><strong>sp_len</strong> – float - calculated lenght/circumference of the delimiting spline</p></li>
+<li><p><strong>patch</strong> – int - arbitrarily designated patch number. This is used to iterate between zones with different layup.</p></li>
+<li><p><strong>origin</strong> – object - vector definition of average point</p></li>
+<li><p><strong>pt_list</strong> – object - all spline points</p></li>
+<li><p><strong>mind</strong> – float - minimum distance from other drop-off spline</p></li>
+<li><p><strong>close_other</strong> – str - closest drop-offs - corresponds to mind</p></li>
+<li><p><strong>local_thickness</strong> – float - local laminate stack thickness</p></li>
+<li><p><strong>local_holes</strong> – list - list of hole objects relevant for this patch/section/layup</p></li>
+<li><p><strong>overlap</strong> – bool - True if delimiting splines close to or on edges</p></li>
+<li><p><strong>remaining_splines</strong> – list - the corresponding spline delimitations for remianing plies</p></li>
+<li><p><strong>materials</strong> – list - contains “material” class variables</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fact_base.report">
+<span class="sig-prename descclassname"><span class="pre">fact_base.</span></span><span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fact_base.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is used to forms the report, the main output of the DFM package. The default values denote the headings of each of the report sections. The rest of these variables is filled by rules triggered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>warnings</strong> – str - Default value = “n             WARNINGS:  n” - user likely needs to address this</p></li>
+<li><p><strong>design_errors</strong> – str - Default value = “n             DESIGN ERRORS: n” - user must address this</p></li>
+<li><p><strong>suggested_checks</strong> – str - Default value = “n             SUGGESTED CHECKS: n” - only informs user, might not need to be actioned</p></li>
+<li><p><strong>check_issues</strong> – str - Default value = “n              DESIGN CHECK ISSUES: n” - notes on what check was skipped</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="reference-documents">
+<h2>Reference documents<a class="headerlink" href="#reference-documents" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="layup%20database.html">Layup database</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">4.4.1. Fact Base</a><ul>
+<li><a class="reference internal" href="#usage-and-parameters">Usage and parameters</a></li>
+<li><a class="reference internal" href="#reference-documents">Reference documents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Developers.html"
+                          title="previous chapter"><span class="section-number">4. </span>Development notes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="layup%20database.html"
+                          title="next chapter">Layup database</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/FactBase.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="layup%20database.html" title="Layup database"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Developers.html" title="4. Development notes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" ><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.1. </span>Fact Base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

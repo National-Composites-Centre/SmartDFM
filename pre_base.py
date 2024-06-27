@@ -134,6 +134,7 @@ class p3(FactBase):
                 else:
                     self.runtime_error += "Layup file not found, or not stored in correct standard."
                 self.StandardLayup = CompositeStandard.CompositeDB(BaseModel) #empty layup when layup missing
+                #TODO Fix the exception run!!
 
             self.ite += 1  
             print("p3 run")          

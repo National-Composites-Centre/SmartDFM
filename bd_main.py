@@ -3,7 +3,7 @@
 
 #THIS SCRIPT IS COMPLETELY UNUSED IN VERSION 3.0 , in other versions used for UI
 
-'''
+
 
 #backseat designer 1 works with Python only,
 #no KE or Expert system library has been used.
@@ -31,15 +31,17 @@ from pydantic import ValidationError
 
 import os
 
+from runSDFM import sDFM
 
 
-#try: 
-CATIA = win32com.client.Dispatch("CATIA.Application")
-partDocument2 = CATIA.ActiveDocument
-cat_name = CATIA.ActiveDocument.Name
-cat_name = cat_name.split(".CATPart")[0]
-#except:
-#    cat_name = "Enter name here"
+try: 
+    CATIA = win32com.client.Dispatch("CATIA.Application")
+    partDocument2 = CATIA.ActiveDocument
+    cat_name = CATIA.ActiveDocument.Name
+    cat_name = cat_name.split(".CATPart")[0]
+except:
+    print("please open CATIA and corresponding file first, make sure no background CATIA instances are running (one was likely started now)")
+    sys.exit(1)
 
 
 #replacing PySimpleGUI by Kivy
@@ -114,7 +116,8 @@ class MainApp(App):
 
 
         #change location!!
-        subprocess.run("conda run -n sdc_kivy_3 python C:\\code\\smartdfm_kivy\\runSDFM.py") 
+        #subprocess.run("conda run -n sdc_kivy_3 python C:\\code\\smartdfm_kivy\\runSDFM.py") 
+        sDFM(part_name,part_folder)
 
 
 
@@ -137,4 +140,3 @@ class MainApp(App):
 MainApp().run()
 
 
-'''

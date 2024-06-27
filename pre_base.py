@@ -19,6 +19,10 @@ from step_features import hole_data, flange_data, MR_data
 from CATIA_utils import hole_loc, export_step
 from ED import ED
 
+import CompositeStandard
+
+from jsonic import deserialize
+
 #required to run WS through cmd
 import subprocess
 
@@ -69,9 +73,6 @@ class p1(FactBase):
     #Required variables
     part_name: str = Field()
     path: str = Field()
-    #only run this if layup_file == None -- verify this works
-    #(eventually change to , run if None or False)
-
 
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
@@ -107,179 +108,154 @@ class p2(FactBase):
             print("p2 run")
             self.ite += 1
         return(self)    
-
+    
 class p3(FactBase):
 
     #Required variables
     part_name: str = Field()
     path: str = Field()
-    layup_file: str = Field()
 
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
 
     def solve(self):
-        #this takes the layup from file and turns it into list
-        print(self.max_ply_layup)
-        if self.max_ply_layup == None:
-            with open(self.path+self.part_name+".txt", "r") as text_file:
-                f = text_file.read()
-                
-            w = f.split("[LAMINATE]")[1]
-            w = w.split("[MATERIALS]")[0]
-            ori = w.split('\n')[1]
-            ori = ori.replace("[","")
-            layup = ori.replace("]","")
-            layup = layup.replace(" ","")
 
-            if (layup == None) or (layup == ""):
-                self.runtime_error = "Layup is ill defined, please specify layers by numbers corresponding to orientation in degrees."
-                return(self)
-            else:
-                #it also forces all angles to be  between -90 and 90
-                l2 = []
-                for l in layup.split(",")[:]:
-                    #not sure why this is required, but....
-                    
-                    #to account for non-ASCII "-"
-                    if "-" in l:
-                        h = l.replace("-","")
-                        h = float(h)
-                        h = h *-1
-                    else:
-                        try:
-                            h = float(l)
-                        except:
-                            self.runtime_error = "Layup is ill defined, the values between ',' must be numbers only."
-                    
-                    #180deg shifts until the layup exits in correct range
-                    while h > 90:
-                        h = h -180
-                    while h < -90:
-                        h = h + 180
-                        
-                    #construct the return string of layer orientations
-                    l2.append(h)
+        if self.StandardLayup == None:
+            try:
+                #Open json file
+                with open(self.path+self.part_name+"_layup.json","r") as in_file:
+                    json_str= in_file.read()
+                #use jsonic library to turn into Python objects according to CompositeStandard
+                self.StandardLayup = deserialize(json_str,string_input=True)
+            except:
+                #for now insist on layup
+                if self.runtime_error == None:
+                    self.runtime_error = "Layup file not found, or not stored in correct standard."
+                else:
+                    self.runtime_error += "Layup file not found, or not stored in correct standard."
+                self.StandardLayup = CompositeStandard.CompositeDB(BaseModel) #empty layup when layup missing
 
-                self.max_ply_layup = l2
-                print("p3 run")
-                self.ite += 1
+            self.ite += 1  
+            print("p3 run")          
+
         return(self)
 
 class p4(FactBase):
+    #Required variables
+    StandardLayup: object = Field()
+
+    def __init__(self, d: FactBase):
+        self = FactBase.__init__(self, **d.__dict__)
+
+    def solve(self):
+        if self.max_ply_layup == None:
+            s = []
+            allS = [] #all splines
+            #assuming all plies from same stack - and ordered reasonably
+            for i in self.StandardLayup.allGeometry[:]:
+                if type(i) == type(CompositeStandard.Sequence()):
+                    for ii  in i.plies:
+                        s.append(ii.orientation)
+                        #accomodate for piece provided under ply
+                        try:
+                            allS.append(ii.cutPieces[0].splineRelimitation)
+                        except:
+                            #TODO how else can drop-off be defined? accomodate for 
+                            print("ply has no cut-pieces - assumed this ply reaches all the way to the edge for now")
+                            allS.append("edge")
+
+            self.max_ply_layup = s
+            self.all_relimitations = allS
+            
+            self.ite += 1
+
+            print("p4 run")
+        return(self)
+
+class p5(FactBase):
     #calculate the numbers of segments with different layup and specify each layup
 
     #currently ignores cross-overs (implement layup-utils cross-over function later)
 
+    #for now works only with MAJOR layup in a JSON file
+
     #Required variables
-    part_name: str = Field()
-    path: str = Field()
-    layup_file: str = Field()
-    max_ply_layup: list = Field()
-    layup_splines: list = Field()
-    #layup_splines: conlist(hole, min_length=1)
-
-    #somehow check the layup already exists 
-    #layup_sections[0].layup.sequence: list = Field()
-
+    StandardLayup: object = Field()
+    max_ply_layup: list = Field() # 
+    all_relimitations: list = Field() 
+    
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
 
     def solve(self):
         if self.layup_sections == None:
             #later move major part of this to layup_utils -- keep only rule type stuff here
-            
-            #obtain the list of delimiting splines 
-            #read the file
-            with open(self.path+self.part_name+".txt", "r") as text_file:
-                f = text_file.read()
-                
-            w = f.split("[LAMINATE]")[1]
-            w = w.split("[MATERIALS]")[0]
-            ori = w.split('\n')[2]
-            ori = ori.replace("[","")
-            lp = ori.replace("]","")
 
-            l2 = []
-            for l in lp.split(",")[:]:  
-                l2.append(l)
+            # L2 LIST OF SPLINES
 
-            val, cnt = np.unique(l2, return_counts=True)
+            #val, cnt = np.unique(l2, return_counts=True)
 
             #save edge spline
+            UniqueSplines = []
+            for i in self.StandardLayup.allGeometry[:]:
+                if type(i) == type(CompositeStandard.Spline()):
+                    UniqueSplines.append(i)
 
-            spe = f.split("[EDGE SPLINE]")[1]
-            spe = spe.split("\n\n")[0]
-            pt_list = np.asarray([[0,0,0]])
-            ln = 0
-            for n,ii in enumerate(spe.split("\n")):
+                    if i.memberName == 'edge':
+                        self.edge_points = i.points
+                        
+                        ln = 0
+                        for n, ii in enumerate(i.points):
+                            if n > 1:
+                                #addidnt the distance between neighbouring points
+                                ln = ln + math.sqrt((i.points[n].x-i.points[n-1].x)**2+
+                                                    (i.points[n].y-i.points[n-1].y)**2+
+                                                    (i.points[n].z-i.points[n-1].z)**2)
 
-                if n != 0:
-                    x = float(ii.split()[0])
-                    y = float(ii.split()[1])
-                    z = float(ii.split()[2])
+                        self.edge_len = ln #TODO delete this, should be sufficient within layup compo-standar
+                        i.length =ln
 
-                    pt_list = np.concatenate((pt_list, np.asarray([[x,y,z]])),axis=0)
+                        #is there a need for 'edge' to still be separate ? #TODO
 
-                if n > 1:
-                    ln = ln + math.sqrt((pt_list[n,0]-pt_list[n-1,0])**2+(pt_list[n,1]-pt_list[n-1,1])**2+(pt_list[n,2]-pt_list[n-1,2])**2)
-            pt_list = np.delete(pt_list, 0,axis=0)
-            self.edge_points = pt_list
-            self.edge_len = ln
-
-
-            #print('val',val)
             #pathces allows for number of groups for drop-ffs
             #inside of each patch, sits list of splines (when cross overs come, it is going to be spline amalgamations)
             patches = [[]]
 
             self.layup_sections = []
             ptch = 0
-            for i in val:
-                if i != "'f'":
-                    #print(i)
-                    #collect list of points
-                    #
-                    #accomodate for random q-marks
-                    sp = i.replace("'","")
-                    sp = sp.replace('"','')
-                    sp = sp.replace(" ","")
-
-                    spx = f.split("[SPLINES]")[1]
-                    spx = spx.split(sp)[1]
-                    spx = spx.split("spline")[1] #newer - deals with addition closed/open info
-                    spx = spx.split("\n\n")[0]
+            for i in UniqueSplines:
+                if i.memberName != "edge":
 
                     ln = 0
+                    xt = 0 
+                    yt = 0
+                    zt = 0
+                    ct = 0
                     pt_list = np.asarray([[0,0,0]])
-                    for n,ii in enumerate(spx.split("\n")):
-                        #print("n",n)
-                        #print("ii",ii)
-                        if n != 0:
-                            x = float(ii.split()[0])
-                            #print("x",x)
-                            y = float(ii.split()[1])
-                            #print("y",y)
-                            z = float(ii.split()[2])
-                            #print("z",z)
-                            pt_list = np.concatenate((pt_list, np.asarray([[x,y,z]])),axis=0)
+                    for n,ii in enumerate(i.points):
 
                         #calculateing circumference by adding points 
-                        
                         if n > 1:
-                            ln = ln + math.sqrt((pt_list[n,0]-pt_list[n-1,0])**2+(pt_list[n,1]-pt_list[n-1,1])**2+(pt_list[n,2]-pt_list[n-1,2])**2)
+                            ln = ln + math.sqrt((ii.x-i.points[n-1].x)**2+
+                                                (ii.y-i.points[n-1].y)**2+
+                                                (ii.z-i.points[n-1].z)**2)
+                        pt_list = np.concatenate((pt_list,np.asarray([[ii.x,ii.y,ii.z]])),axis=0)
+                        xt += ii.x
+                        yt += ii.y
+                        zt += ii.z
+                        ct += 1
 
-                    pt_list = np.delete(pt_list, 0,axis=0)
+                    pt_list = np.delete(pt_list,0,axis=0)
 
-                    origin = np.asarray([np.average(pt_list[:,0]),np.average(pt_list[:,1]),np.average(pt_list[:,2])])
+                    #averages
+                    origin = np.asarray([xt/ct,yt/ct,zt/ct])
 
                     if patches == [[]]:
                         #dont know layup yet, that will come from definition of patches
-                        patches[0].append(layup(sp_len = ln,pt_list = pt_list,sp_def = i, origin =origin,patch = ptch))
-                        #print(patches[0][0].origin)
-                        
+                        patches[0].append(layup(sp_len = ln,pt_list = i.points,sp_def = i.memberName, origin =origin,patch = ptch))
+   
                     else:
-                        #ok ok , special cases of weird layups will break this BEWARE! 
+                        #special cases of weird layups will break this BEWARE! 
                         #but the distance of points method should work for most splines that do not cross over...
                         #A last patch origin point
                         #B closest poitn on new spline to A
@@ -298,6 +274,7 @@ class p4(FactBase):
                                 iii = iii + 1
                             max_dist = 0
                             iii = 0
+
                             while iii < np.size(last_patch[0].pt_list,0):
                                 dd = math.sqrt((B[0]-pt_list[iii,0])**2+(B[1]-pt_list[iii,1])**2+(B[2]-pt_list[iii,2])**2)
                                 if dd > max_dist:
@@ -309,19 +286,17 @@ class p4(FactBase):
                             BC = max_dist
                             AC = math.sqrt((A[0]-C[0])**2+(A[1]-C[1])**2+(A[2]-C[2])**2)
 
-
                             if AC < BC:
                                 #otherwise append to current patch
-                                patches[ii].append(layup(sp_len = ln,pt_list = pt_list,sp_def = i, origin =origin,patch = ptch)) 
+                                patches[ii].append(layup(sp_len = ln,pt_list = i.points,sp_def = i.memberName, origin =origin,patch = ptch)) 
                                 patches[ii].sort(key=lambda x: x.sp_len, reverse=True)
                                 break
                             else:
                                 #the origin of current patch is outside of previous patch
-                                
                                 if len(patches) - 1 == ii:
                                     #append new patches list of singular object
                                     ptch = ptch + 1
-                                    patches.append([layup(sp_len = ln,pt_list = pt_list,sp_def = i, origin =origin,patch = ptch)])
+                                    patches.append([layup(sp_len = ln,pt_list = i.points,sp_def = i.memberName, origin =origin,patch = ptch)])
                                     break
                                     #else continue to next for loop  
 
@@ -330,29 +305,27 @@ class p4(FactBase):
 
             #add last segment delimited by edge of part
             #append as separate patch, and check if this works
-            patches.append([layup(sp_len = self.edge_len,pt_list = self.edge_points,sp_def = "NO SPLINE",patch = 9999)])
+            patches.append([layup(sp_len = self.edge_len,pt_list = self.edge_points,sp_def = "edge",patch = 9999)])
 
-            #material list for thickness
-            #(check if Max thickness rule still needed)
-            #take material information out of layup file
-            with open(self.path+self.part_name+".txt", "r") as text_file:
-                f = text_file.read()
-                
-            w = f.split("[MATERIALS]")[1]
-            w = w.split("[SPLINES]")[0]
+            #unique materials
+            w = []
 
-            #establish SQL connection for mat ref
-            #cnnC,crrC = cnt_X('NCC')
+            for i in self.StandardLayup.allGeometry[:]:
+                if type(i) == type(CompositeStandard.Sequence()):
+                    for ii  in i.plies:
+                        if ii.material not in w:
+                            w.append(ii.material)
+                            
             ttmax = 0
 
             mpl = self.max_ply_layup
+
+            #get local thicknesses 
 
             for ii, patch in enumerate(patches):
                 #reverse the order 
                 patch.sort(key=lambda x: x.sp_len, reverse=False)
                 local_splines = []
-
-                tt = 0
 
                 for spline in patch:
                     seq = []
@@ -361,76 +334,60 @@ class p4(FactBase):
 
                     for i ,layer in enumerate(mpl):
                         q = True
-                        #check if this splien is referenced in other patches
+
+                        #check if this spline is referenced in other patches
                         for iii, patch2 in enumerate(patches):
                             if iii != ii:
                                 for spline2 in patch2:
-                                    if spline2.sp_def == l2[i]:
+                                    if spline2.sp_def == self.all_relimitations[i]:
                                         q = False
 
                         #check if referenced in above splines in this patch
-                        if l2[i] in local_splines:
+                        if self.all_relimitations[i] in local_splines:
                             q = False
+
+                        #exception for edge layers (those are part of all patches)
+                        if self.all_relimitations[i] == "edge":
+                            q = True
 
                         #if neither seq.append
                         if q == True:
                             seq.append(layer)
-                            lrs.append(self.layup_splines[i])
+                            lrs.append(spline.sp_def)
 
                             #also calculate local thickness 
-                            if "uniform" in w:
+                            if len(w) == 1:
 
-                                #if uniform this section does not need to 
-                                qw = w.split("[")[1]
-                                qw = qw.split("]")[0]
-                                
-                                lf3 = self.path+"LD_layup_database.txt"
-
-                                try:
-                                    with open(lf3, "r") as text_file:
-
-                                        for i ,line in enumerate(text_file.readlines()):
-                                            if line.count(",") > 0 and i != 0 and line.split(",")[1] == qw:
-                                                #print("yes")
-                                                fd = float(line.split(",")[8])
-                                                mu = line.split(",")[11]
-                                except:
-                                    self.runtime_error = "The current folder does not contain LD_layup_database.txt, this"\
-                                                        +" is currently required by the standard layup definition."
-                                    return(self)
-                                #this should be checked, gettign correct thickness values?
-                                tt += fd
-                                #tt = fd*
                                 self.uniform_material = True
-                                self.material_u = mu
-                            if "variable" in w:
-                                #initiate materials list
-                                mts = []
-                                qw = w.split("[")[1]
-                                qw = qw.split("]")[0]
+
+                                #find thickness of material layer
+                                for i in self.StandardLayup.allMaterials[:]:
+                                    if i.materialName == w[0]:
+                                        t_mat = float(i.thickness)
+                                        mu = i
+                                        #to not run multiple
+                                        break
+                                #thickness 
+                                tt = tt + t_mat
                                 
-                                #tt = 0
+                                self.material_u = mu
 
-                                #mat = qw.split(",")[i]
-                                for mat in qw.split(","):
+                            elif len(w) > 1:
+                                #TODO THIS IS WRONG - MULTIMAT NOT WORKING - IT SHOULD NOT ITERATE THROUGH w
+                                mts = []
+                                for matName in w:
+                                    #find thickness of material layer
+                                    for i in self.StandardLayup.allMaterials[:]:
+                                        if i.materialName == matName:
+                                            t_mat = i.thickness
+                                            mu = i
 
-                                        #print("qw",qw)
-                                        lf3 = self.path+"LD_layup_database.txt"
-                                        with open(lf3, "r") as text_file:
+                                    tt = tt + t_mat
+                                    mts.append(mu)
 
-                                            for i ,line in enumerate(text_file.readlines()):
-                                                if line.count(",") > 0 and i != 0 and line.split(",")[1] == mat:
-                                                    #print("yes")
-                                                    fd = float(line.split(",")[8])
-                                                    mts.append(material(mat_name=line.split(",")[1],mat_type =line.split(",")[11],
-                                                                        l_thick =float(line.split(",")[8])))
-
-
-
-                                tt = tt + fd
+                                tt = tt + t_mat
                                 self.uniform_material = False
-                                spline.materials = mts
-                                #print(spline.materials) 
+                                spline.materials = mts 
                     
 
                     local_splines.append(spline.sp_def)
@@ -440,22 +397,19 @@ class p4(FactBase):
                     spline.sequence = seq
                     spline.remaining_splines = lrs
                     
-                    #clearer messaging where no delimiting spline is found
-                    if spline.sp_def == "NO SPLINE":
-                        spline.sp_def = "Edge of part"
+
                     #save segment of layup
                     self.layup_sections.append(spline)
 
 
             self.layup_max_thickness = ttmax
 
-
             #once you have 2d table of patches finished go through each spline object specified and define layup 
 
             #if segments still empty, create a standalone single segment for the full layup
 
             #use the above to also find distance between any combination of patch splines?? 
-            print("p4 run")
+            print("p5 run")
 
             #not to forget database disconnect:
             #dc_X('NCC',cnnC,crrC)
@@ -465,7 +419,7 @@ class p4(FactBase):
         return(self)
 
 
-class p5(FactBase):
+class p6(FactBase):
     #finds the nearest distance between splines
 
     #DOES NOT WORK WITHOUT EDGE DEFINITION -- all the splines overlap
@@ -493,58 +447,48 @@ class p5(FactBase):
                 change = 0
                 while ii < len(self.layup_sections):
                     
+                    #remove edge points from first spline list     
 
-                    #SORT OUT WHAT HAPPENS WHEN ONE OF THE SPLINES OVERLAP THE EDGE (SPOILER, THERE WILL BE NO POINTS....)
-
-                    #remove edge points from first spline list
-                    sls1 = np.asarray([[0,0,0]])
+                    sls1 = []
                     for p1 in self.layup_sections[i].pt_list:
                         dpt1 = 9999
                         for p2 in self.edge_points:
-                            dpt = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
+                            dpt = math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2)
                             if dpt < dpt1:
                                 dpt1 = dpt
                         if dpt1 > et:
-                            sls1 = np.concatenate((sls1,np.asarray([[p1[0],p1[1],p1[2]]])),axis=0)
+                            sls1.append(p1)
                         else:
                             self.layup_sections[i].overlap = True
-                    sls1 = np.delete(sls1,0,axis = 0)
                     
-                    if np.size(sls1,0) == 0:
+                    if len(sls1) == 0:
                         #if no points were stored it means edge spline is the spline
                         #in such case the spline is kept in full
                         sls1 = self.layup_sections[i].pt_list
 
                     #remove edge points from second spline list
-                    sls2 = np.asarray([[0,0,0]])
+                    sls2 = []
                     for p1 in self.layup_sections[ii].pt_list:
                         dpt1 = 9999
                         for p2 in self.edge_points:
-                            dpt = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
+                            dpt = math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2)
                             if dpt < dpt1:
                                 dpt1 = dpt
                         if dpt1 > et:
-                            sls2 = np.concatenate((sls2,np.asarray([[p1[0],p1[1],p1[2]]])),axis=0)
+                            sls2.append(p1)
                         else:
                             self.layup_sections[ii].overlap = True
-                    sls2 = np.delete(sls2,0,axis = 0)
-
-                    if np.size(sls2,0) == 0:
+                    
+                    if len(sls2) == 0:
                         #if no points were stored it means edge spline is the spline
                         #in such case the spline is kept in full
                         sls2 = self.layup_sections[ii].pt_list
-
-
-
-                    #print(self.layup_sections[ii].sp_def)
-
-                    #print(sls2)
 
                     #CURRENTLY ISSUE WITH WORKING WITH ONE SPLINE ONLY --- DONT THINK IT HAS A WAY OF CALCULATING DISTANCE...
 
                     for p1 in sls1:
                         for p2 in sls2:
-                            dist = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
+                            dist = math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2 + (p1.z-p2.z)**2)
                             if dist <= mind:
                                 mind = dist
                                 i_id = ii
@@ -567,13 +511,12 @@ class p5(FactBase):
                 #re-run of p5
                 self.layup_sections[i].mind = 0
 
-            #print(mind)
-            print("p5 run")
+            print("p6 run")
             self.ite += 1
 
         return(self)
 
-class p6(FactBase):
+class p7(FactBase):
 
     #calculate flange angle (this one currently not used)
     #calculate major radius radius
@@ -584,7 +527,7 @@ class p6(FactBase):
     step_file: str = Field()
     part_name: str = Field()
     path: str = Field()
-    MajorRaius: bool = Field()
+    MajorRadius: bool = Field()
 
     #@validator("flange", pre=True)
     def __init__(self, d: FactBase):
@@ -602,84 +545,7 @@ class p6(FactBase):
             self.ite += 1
         return(self)
 
-class p7(FactBase):
-    #obtain maximum thickness of laminate  and local thicknesses 
 
-    #Required variables
-    #max_ply_layup: list = Field()
-    layup_sections: conlist(object, min_length=1)
-    part_name: str = Field()
-    path: str = Field()
-
-    def __init__(self, d: FactBase):
-        self = FactBase.__init__(self, **d.__dict__)
-
-    def solve(self):
-
-        if self.layup_max_thickness == None:
-
-            #take material information out of layup file
-            with open(self.path+self.part_name+".txt", "r") as text_file:
-                f = text_file.read()
-                
-            w = f.split("[MATERIALS]")[1]
-            w = w.split("[SPLINES]")[0]
-
-            #SQL connection replaced by .txt database
-            ttmax = 0
-            for ls in self.layup_sections:
-                tt = 0
-                
-                #print("w",w)
-                if "uniform" in w:
-                    qw = w.split("[")[1]
-                    qw = qw.split("]")[0]
-
-                    #print("qw",qw)
-                    lf3 = self.path+"LD_layup_database.txt"
-                    with open(lf3, "r") as text_file:
-
-                        for i ,line in enumerate(text_file.readlines()):
-                            if line.count(",") > 0 and i != 0 and line.split(",")[1] == qw:
-                                #print("yes")
-                                fd = float(line.split(",")[8])
-
-                    tt = len(ls.sequence)*fd
-        
-                elif "variable" in w:
-                    qw = w.split("[")[1]
-                    qw = qw.split("]")[0]
-                    
-                    #tt = 0
-
-                    for mat in qw.split(","):
-
-                        #print("qw",qw)
-                        lf3 = self.path+"LD_layup_database.txt"
-                        with open(lf3, "r") as text_file:
-
-                            for i ,line in enumerate(text_file.readlines()):
-                                if line.count(",") > 0 and i != 0 and line.split(",")[1] == mat:
-                                    #print("yes")
-                                    fd = float(line.split(",")[8])
-
-                        tt = tt + fd
-                else:
-
-                    for l in ls.sequence:
-                        print("option not curretnly available -- the only material allocation options are 'uniform' and 'variable'")
-                        self.runtime_error = "Materials have to be defined with 'uniform' or 'variable' options."
-
-                if tt > ttmax:
-                    ttmax = tt
-                    #do I need to know which layup is the max?
-
-                ls.local_thickness = tt
-
-            self.layup_max_thickness = ttmax
-            print("p7 run")
-            self.ite += 1
-        return(self)
 
 class p8(FactBase):
     #Finds hole locations
@@ -703,7 +569,6 @@ class p8(FactBase):
             #CATIA method - requires holes to be defined by points in "holes" geometrical set
             if CATIA == True:
                 part = self.path+self.part_name+".catpart"
-                #print(part)
                 f_pt = hole_loc(part)
 
                 i = 0
@@ -783,7 +648,6 @@ class p8(FactBase):
 
                     #loop through the XX matrix, and take away points from it as you go
                     TOT = np.size(XX,0)
-                    #print(TOT)
                     while c < TOT:
 
                         pt = [v1.x,v1.y,v1.z]  # <-- the point to find
@@ -841,7 +705,6 @@ class p8(FactBase):
                         #turn the current vertex into referencevertex
                         v1 = copy.deepcopy(v3)
                         c += 1
-                        #print(c)
                     self.holes.append(h1)
 
                     #for the time being the hole position is going to be the average of vertices
@@ -858,7 +721,6 @@ class p8(FactBase):
                             n += 1
 
                         hs.position = np.asarray([xsm/n,ysm/n,zsm/n])
-            #print(self.holes)
             print("p8 run")
 
             self.ite += 1
@@ -909,9 +771,9 @@ class p10(FactBase):
             for h in self.holes:
                 mind = 9999
                 i = 0
-                #CHANGE INTO FOR LOOP AT SOME POINT
+                #TODO CHANGE INTO FOR LOOP AT SOME POINT
                 while i < np.size(self.edge_points,0):
-                    ldist = math.sqrt((self.edge_points[i,0]-h.position[0])**2+(self.edge_points[i,1]-h.position[1])**2+(self.edge_points[i,2]-h.position[2])**2)
+                    ldist = math.sqrt((self.edge_points[i].x-h.position[0])**2+(self.edge_points[i].y-h.position[1])**2+(self.edge_points[i].z-h.position[2])**2)
                     #print(ldist)
                     if ldist < mind:
                         mind = ldist
@@ -992,7 +854,7 @@ class p12(FactBase):
                     dist = 0
                     i = 0
                     while i < np.size(ls.pt_list,0):
-                        dt = math.sqrt((ls.pt_list[i,0]-h.position[0])**2+(ls.pt_list[i,1]-h.position[1])**2+(ls.pt_list[i,2]-h.position[2])**2)
+                        dt = math.sqrt((ls.pt_list[i].x-h.position[0])**2+(ls.pt_list[i].y-h.position[1])**2+(ls.pt_list[i].z-h.position[2])**2)
                         dist = dist + dt
                         i = i + 1
                     if dist_min > dist:
@@ -1002,8 +864,6 @@ class p12(FactBase):
                 #the shortest cummulative distance corresponds to hole allocation
                 self.layup_sections[ref_sec].local_holes.append(h)
 
-            #for ls in self.layup_sections:
-            #    print(ls.local_holes)
             print("p12 run")
             self.ite += 1
         return(self)
@@ -1092,10 +952,6 @@ class p14(FactBase):
                         pts.append(pt)
 
             self.MR_points = pts
-            
-            #print("MR_points:")
-            #print(pts)
-            #print(self.MajorRadius)
 
             print("p14 run")
             self.ite += 1

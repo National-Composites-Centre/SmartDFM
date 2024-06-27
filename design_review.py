@@ -4,6 +4,9 @@ Created on Mon Oct 17 11:33:10 2022
 
 @author: jakub.kucera
 """
+
+#Used to review GNNs - checking the models.
+
 import pandas as pd
 import numpy as np
 

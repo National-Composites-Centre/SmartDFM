@@ -1,4 +1,0 @@
-Alternatives to GNNs
-====================
-
-

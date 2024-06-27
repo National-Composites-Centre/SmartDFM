@@ -34,9 +34,7 @@ def force9090(layup):
 
     return(l2)
             
-        
 # how about class that holds true/false, and rule in form of if statement
-
 
 def f130a(layup):
     #check if laminate is symmetric
@@ -65,8 +63,6 @@ def f130a(layup):
             print(sym)
             print(ori.split(",")[i] , ori.split(",")[ct-i])
             
-        
-        
         i = i + 1
         
     #Append this to report.
@@ -94,13 +90,11 @@ def f130b(layup):
     #enforce 90 -90 range
     layup = force9090(layup)
     
-    
     #use list
     u = np.asarray([])
     for i in layup.split(",")[:]:
         u = np.concatenate((u,np.asarray([int(i)])),axis=0)
     
-
     mau = int(max(u))
     miu = int(min(u))
 
@@ -115,7 +109,6 @@ def f130b(layup):
     while shift > min_shift:
         print(shift)
         print(u)
-        
         
         # used to be list: u= u + shift...
         tu = u[:].copy()
@@ -155,11 +148,8 @@ def f130b(layup):
                                 tu = np.delete(tu,ii,axis=0)
                             i = -1
                             break
-                                
-                            
-                    
+        
                     ii = ii + 1
-                
                 i = i + 1
         
         

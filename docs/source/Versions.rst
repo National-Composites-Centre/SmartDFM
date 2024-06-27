@@ -10,3 +10,4 @@ Versions
 
 4.0 Moving away from .txt based definition of layup, using JSON standard from https://github.com/National-Composites-Centre/CompoST.
 
+4.2 Includes Kivy GUI again, albeit with very limited functionality.

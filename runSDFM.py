@@ -22,7 +22,7 @@ import os
 
 def sDFM(part,location):
 
-    version = str(3.0)
+    version = str(4.1)
         
     t1_start = perf_counter()
 
@@ -40,19 +40,11 @@ def sDFM(part,location):
     p = pre_base
 
     #bit cured #TODO make this auto generate?
-    #active_pre = [p.p1,p.p3,p.p4,p.p5,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
-
-    #temp cut down
     active_pre = [p.p1,p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p9,p.p10,p.p11,p.p12,p.p13,p.p14,p.p15,p.p16] 
 
-    #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\MR_49_10.stp"
-    #d.step_file = "D:\\Kestrel\\conceptual outer pv\\c4\\bulkhead_c4_v0.stp"
-    #d.step_file = "D:\\CoSinC_WP4.2\\TestCad\\AUTO-TESTING\\FL_19.stp"
-    #active_pre = [16]
+    #TODO p6 too flexible - make it into two - one for angle, on for radius
 
-    #p6 too flexible - make it into two - one for angle, on for radius
-
-    #14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
+    #TODO 14 will be used for testing- and later adjusted for integration - once WS radius is re-trained
 
     #these rules are numbered according ty Bryn's design rules document
     r = rule_base
@@ -92,9 +84,7 @@ def sDFM(part,location):
     #temp:
     if d.runtime_error == None:
         for i in active_rules:
-            #build function to execute - functions are named according to lists
-            #build_func = "problem = rule_base.r"+str(i)+"(d)"
-            #print(build_func)
+            
             #Two levels of error handling, inner loop checks for missing information.
             #Missing information is not technically an error, but intended method for 
             #skipping rules that don't apply.
@@ -103,11 +93,8 @@ def sDFM(part,location):
             try:
                     #is this too brute force ?
                 try:
-
-                    #exec(build_func)
                     d = i(d).solve()
-                #print("updated, here add some iterator to check when rules triggered")
-            
+
                 except ValidationError as e:
 
                     #print(e)
@@ -132,9 +119,6 @@ def sDFM(part,location):
                     d.report.suggested_checks+"\n"+d.report.check_issues+\
                         "\n This report is also availble at "+d.path+" as a .txt file"+\
                             "\n"+"\nSmartDFM "+d.version+"\n\n"+"Design was checked in "+str(lapsed)+" seconds."
-    #window['-INPUT0-'].Update(total_report)
-    #self.t3.text = total_report
-
 
     print(d.report.design_errors)
     print(d.report.warnings)

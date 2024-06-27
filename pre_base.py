@@ -73,9 +73,6 @@ class p1(FactBase):
     #Required variables
     part_name: str = Field()
     path: str = Field()
-    #only run this if layup_file == None -- verify this works
-    #(eventually change to , run if None or False)
-
 
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
@@ -220,8 +217,6 @@ class p5(FactBase):
 
                         #is there a need for 'edge' to still be separate ? #TODO
 
-
-            #print('val',val)
             #pathces allows for number of groups for drop-ffs
             #inside of each patch, sits list of splines (when cross overs come, it is going to be spline amalgamations)
             patches = [[]]
@@ -240,7 +235,6 @@ class p5(FactBase):
                     for n,ii in enumerate(i.points):
 
                         #calculateing circumference by adding points 
-                    
                         if n > 1:
                             ln = ln + math.sqrt((ii.x-i.points[n-1].x)**2+
                                                 (ii.y-i.points[n-1].y)**2+
@@ -255,18 +249,13 @@ class p5(FactBase):
 
                     #averages
                     origin = np.asarray([xt/ct,yt/ct,zt/ct])
-                    #print(origin, "ORIGIN",i.memberName)
-
-                    #print(patches)
 
                     if patches == [[]]:
                         #dont know layup yet, that will come from definition of patches
                         patches[0].append(layup(sp_len = ln,pt_list = i.points,sp_def = i.memberName, origin =origin,patch = ptch))
-
-                    
-                          
+   
                     else:
-                        #ok ok , special cases of weird layups will break this BEWARE! 
+                        #special cases of weird layups will break this BEWARE! 
                         #but the distance of points method should work for most splines that do not cross over...
                         #A last patch origin point
                         #B closest poitn on new spline to A
@@ -274,7 +263,6 @@ class p5(FactBase):
 
                         for ii, last_patch in enumerate(patches):
                             A = last_patch[0].origin
-                            #print(A, "LAST PATCH ORIGIN")
 
                             min_dist = 90000000000
                             iii = 0
@@ -286,7 +274,6 @@ class p5(FactBase):
                                 iii = iii + 1
                             max_dist = 0
                             iii = 0
-                            #print(B, "B")
 
                             while iii < np.size(last_patch[0].pt_list,0):
                                 dd = math.sqrt((B[0]-pt_list[iii,0])**2+(B[1]-pt_list[iii,1])**2+(B[2]-pt_list[iii,2])**2)
@@ -294,14 +281,10 @@ class p5(FactBase):
                                     max_dist = dd
                                     C = np.asarray([pt_list[iii,0],pt_list[iii,1],pt_list[iii,2]])
                                 iii = iii + 1
-                            #print(C,"C")
                             
                             BA = min_dist
                             BC = max_dist
                             AC = math.sqrt((A[0]-C[0])**2+(A[1]-C[1])**2+(A[2]-C[2])**2)
-                            #print(BC, "BC")
-                            #print(AC, "AC")
-
 
                             if AC < BC:
                                 #otherwise append to current patch
@@ -310,7 +293,6 @@ class p5(FactBase):
                                 break
                             else:
                                 #the origin of current patch is outside of previous patch
-                                
                                 if len(patches) - 1 == ii:
                                     #append new patches list of singular object
                                     ptch = ptch + 1
@@ -325,14 +307,8 @@ class p5(FactBase):
             #append as separate patch, and check if this works
             patches.append([layup(sp_len = self.edge_len,pt_list = self.edge_points,sp_def = "edge",patch = 9999)])
 
-            #print("start PATCHES")
-
-            #print(len(patches), " no patches")
-
-            #print("end PATCHES")
-
-            #w is materials...
-            w = [] #unique materials
+            #unique materials
+            w = []
 
             for i in self.StandardLayup.allGeometry[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
@@ -358,18 +334,14 @@ class p5(FactBase):
 
                     for i ,layer in enumerate(mpl):
                         q = True
-                        #print(self.all_relimitations[i], "current layer spline")
 
                         #check if this spline is referenced in other patches
                         for iii, patch2 in enumerate(patches):
-                            #print(ii, iii, "COMPARE III")
                             if iii != ii:
                                 for spline2 in patch2:
-                                    #print(spline2.sp_def, self.all_relimitations[i], "compare spline")
                                     if spline2.sp_def == self.all_relimitations[i]:
                                         q = False
 
-                        #print(q, "Q")
                         #check if referenced in above splines in this patch
                         if self.all_relimitations[i] in local_splines:
                             q = False
@@ -378,7 +350,6 @@ class p5(FactBase):
                         if self.all_relimitations[i] == "edge":
                             q = True
 
-                        #print(q, "Q")
                         #if neither seq.append
                         if q == True:
                             seq.append(layer)
@@ -416,12 +387,10 @@ class p5(FactBase):
 
                                 tt = tt + t_mat
                                 self.uniform_material = False
-                                spline.materials = mts
-                                #print(spline.materials) 
+                                spline.materials = mts 
                     
 
                     local_splines.append(spline.sp_def)
-                    #print(ttmax, tt)
                     if ttmax < tt:
                         ttmax = tt
                     spline.local_thickness = tt
@@ -434,7 +403,6 @@ class p5(FactBase):
 
 
             self.layup_max_thickness = ttmax
-
 
             #once you have 2d table of patches finished go through each spline object specified and define layup 
 
@@ -479,9 +447,6 @@ class p6(FactBase):
                 change = 0
                 while ii < len(self.layup_sections):
                     
-
-                    #SORT OUT WHAT HAPPENS WHEN ONE OF THE SPLINES OVERLAP THE EDGE (SPOILER, THERE WILL BE NO POINTS....)
-
                     #remove edge points from first spline list     
 
                     sls1 = []
@@ -495,7 +460,6 @@ class p6(FactBase):
                             sls1.append(p1)
                         else:
                             self.layup_sections[i].overlap = True
-                    
                     
                     if len(sls1) == 0:
                         #if no points were stored it means edge spline is the spline
@@ -519,12 +483,6 @@ class p6(FactBase):
                         #if no points were stored it means edge spline is the spline
                         #in such case the spline is kept in full
                         sls2 = self.layup_sections[ii].pt_list
-
-
-
-                    #print(self.layup_sections[ii].sp_def)
-
-                    #print(sls2)
 
                     #CURRENTLY ISSUE WITH WORKING WITH ONE SPLINE ONLY --- DONT THINK IT HAS A WAY OF CALCULATING DISTANCE...
 
@@ -553,7 +511,6 @@ class p6(FactBase):
                 #re-run of p5
                 self.layup_sections[i].mind = 0
 
-            #print(mind)
             print("p6 run")
             self.ite += 1
 
@@ -612,7 +569,6 @@ class p8(FactBase):
             #CATIA method - requires holes to be defined by points in "holes" geometrical set
             if CATIA == True:
                 part = self.path+self.part_name+".catpart"
-                #print(part)
                 f_pt = hole_loc(part)
 
                 i = 0
@@ -692,7 +648,6 @@ class p8(FactBase):
 
                     #loop through the XX matrix, and take away points from it as you go
                     TOT = np.size(XX,0)
-                    #print(TOT)
                     while c < TOT:
 
                         pt = [v1.x,v1.y,v1.z]  # <-- the point to find
@@ -750,7 +705,6 @@ class p8(FactBase):
                         #turn the current vertex into referencevertex
                         v1 = copy.deepcopy(v3)
                         c += 1
-                        #print(c)
                     self.holes.append(h1)
 
                     #for the time being the hole position is going to be the average of vertices
@@ -767,7 +721,6 @@ class p8(FactBase):
                             n += 1
 
                         hs.position = np.asarray([xsm/n,ysm/n,zsm/n])
-            #print(self.holes)
             print("p8 run")
 
             self.ite += 1
@@ -911,8 +864,6 @@ class p12(FactBase):
                 #the shortest cummulative distance corresponds to hole allocation
                 self.layup_sections[ref_sec].local_holes.append(h)
 
-            #for ls in self.layup_sections:
-            #    print(ls.local_holes)
             print("p12 run")
             self.ite += 1
         return(self)
@@ -1001,10 +952,6 @@ class p14(FactBase):
                         pts.append(pt)
 
             self.MR_points = pts
-            
-            #print("MR_points:")
-            #print(pts)
-            #print(self.MajorRadius)
 
             print("p14 run")
             self.ite += 1

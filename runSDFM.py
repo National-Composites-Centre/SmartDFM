@@ -109,7 +109,7 @@ def sDFM(part,location):
             
             except Exception as er:
 
-                print(er)
+                #print(er)
                 #print("Rule "+str(i)+" not checked")
                 stre = "Rule "+str(i)+" not checked due to DFM tool error."
                 #consider printing some part of the actual error?

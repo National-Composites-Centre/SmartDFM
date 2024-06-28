@@ -66,29 +66,7 @@ class pXX(FactBase):
             #print out for troubleshooting purposes
             print("pX run")
         return(self)
-
-
-class p2(FactBase):
-    #Variables to be obtained
-    step_file: bool = Field(None)
-
-    #Required variables
-    part_name: str = Field()
-    path: str = Field()
-
-    def __init__(self, d: FactBase):
-        self = FactBase.__init__(self, **d.__dict__)
-
-    def solve(self):
-        #Verify .stp file is available
-        if self.step_file == None:
-            if os.path.exists(self.path+self.part_name+".stp"):
-                self.step_file = True
-            else:
-                self.step_file = False
-            print("p2 run")
-            self.ite += 1
-        return(self)    
+   
     
 class p3(FactBase):
 
@@ -490,8 +468,8 @@ class p6(FactBase):
 
             else:
                 #This account for situation where no drop-offs were recorded, prevents
-                #re-run of p5
-                self.layup_sections[i].mind = 0
+                #re-run of p6
+                self.layup_sections[i].mind = 999 # high number to prevent triggering r144
 
             print("p6 run")
             self.ite += 1

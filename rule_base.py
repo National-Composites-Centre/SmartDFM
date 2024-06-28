@@ -276,7 +276,6 @@ class r144(FactBase):
         if self.load_direction == None:
 
             #if no load direction is suggested 
-            print("temp counter:",self.layup_sections.count())
             for x in self.layup_sections:
                 #rule suggests 5.1 mm limit
                 if x.mind < 5.1:

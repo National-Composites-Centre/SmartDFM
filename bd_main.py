@@ -54,9 +54,26 @@ from kivy.uix.floatlayout import FloatLayout
 
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
+from kivy.base import runTouchApp
+from kivy.lang import Builder
+from kivy.properties import StringProperty
 
 import subprocess
 import os
+
+
+Builder.load_string('''
+<ScrolllabelLabel>:
+    Label:
+        text: root.text
+        font_size: 12
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+''')
+
+class ScrolllabelLabel(ScrollView):
+    text = StringProperty('')
 
 class MainApp(App):
 
@@ -78,7 +95,7 @@ class MainApp(App):
         self.l2 = Label(text='Select folder (TBD!):',halign = 'left',pos =(10,600),size_hint=(0.3,0.05))
 
         self.scrl = ScrollView(size_hint=(0.95, 0.75), pos =(10,10))
-        self.t3 = TextInput(text='xxxxxx\n',size_hint=(1,1))
+        self.t3 = ScrolllabelLabel(text='xxxxxx\n',size_hint=(1,1))#,multiline=True)
         self.scrl.add_widget(self.t3)
 
         self.layout.add_widget(self.l1)

@@ -10,7 +10,7 @@ Currently no fully packaged version exists.
 
 The developer installation is therefore the same as user installation.
 
-#. Use "git clone" on https://github.com/National-Composites-Centre/SmartDFM , to understand diefference between version and branches please navigate to :doc:`Versiosn`. The main branch has the latest tested version.
+#. Use "git clone" on https://github.com/National-Composites-Centre/SmartDFM , to understand diefference between version and branches please navigate to :doc:`Versions`. The main branch has the latest tested version.
 #. Set up the Python environment from sdc.yml.
 #. Basic graph neural network models (GNNs) are cloned with the repo. However, please refer to :doc:`GNN usage` for setup. For alternative feature recognition algorthms please refer to :doc:`FeatureRecognition`.
 #. For proper usage of SmartDFM composite definition will also have to be generated. The only composite definition currently integrated is the "layup definition" method, available at https://github.com/National-Composites-Centre/LayupDefinition. For installation of this refer to the local documentation. [ref. the LD docs...]

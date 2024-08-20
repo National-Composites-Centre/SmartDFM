@@ -23,6 +23,12 @@ The models are used within the pre_base.py functions, through command line initi
 
 The command line shown is based on author's installation of Python, through Anaconda, using specific environment name. For alternative Python installations user will need to adjust call-outs to GNNs in ``pre_base.py``. This consists of replacing ``conda run -n ws_pyg_42 python`` with the appropriate command line input that specify Python and the environment if applicable. The "ws_pyg" or other up-to-date .yml should be available in WS_2 folder for generation for the right Python environment ; this is purposefully separate environment from the rest of the SmartDFM tool and should be created separately on user machine as well.
 
+Typically OCC_utils library is not installable through standard .yml based generation of environment. Therefore following command has to be exected within the `ws_pyg_42` (or equivalent):
+
+.. sourcecode::
+
+	pip install git+https://github.com/tpaviot/pythonocc-utils.git
+
 If the user is using other than Anaconda Python environment manager the command needs to be adjusted accordingly.
 
 

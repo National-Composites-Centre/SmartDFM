@@ -17,6 +17,8 @@ Welcome to SmartDFM's documentation!
    
    Developers
    
+   CompoST
+   
    Contact
    
    Versions

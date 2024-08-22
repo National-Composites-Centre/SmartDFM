@@ -19,7 +19,7 @@
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="5. Contact" href="Contact.html" />
+    <link rel="next" title="5. CompoST" href="CompoST.html" />
     <link rel="prev" title="4.4.5. Inference Engine" href="InferenceEngine.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="Contact.html" title="5. Contact"
+          <a href="CompoST.html" title="5. CompoST"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="InferenceEngine.html" title="4.4.5. Inference Engine"
@@ -82,6 +82,23 @@
 <dd><p>This is manually  edited function that is used to validate GNN functionality. It collects gemetry identified and displays it in CATIA.</p>
 </dd></dl>
 
+<section id="catia-pre-4-3-requirements">
+<h2>CATIA-pre 4.3 requirements<a class="headerlink" href="#catia-pre-4-3-requirements" title="Permalink to this heading">¶</a></h2>
+<p>Prior to version 4.3 it was assumed all parts evaluated by SmartDFM have to created in CATIA. Therefore the UI included picking up the appropriate file from live CATIA. This also required contingency for when user forgot to spin-up
+CATIA. In such cae user was informed, and warned any background versions of CATIA must be closed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+        <span class="n">CATIA</span> <span class="o">=</span> <span class="n">win32com</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Dispatch</span><span class="p">(</span><span class="s2">&quot;CATIA.Application&quot;</span><span class="p">)</span>
+        <span class="n">partDocument2</span> <span class="o">=</span> <span class="n">CATIA</span><span class="o">.</span><span class="n">ActiveDocument</span>
+        <span class="n">cat_name</span> <span class="o">=</span> <span class="n">CATIA</span><span class="o">.</span><span class="n">ActiveDocument</span><span class="o">.</span><span class="n">Name</span>
+        <span class="n">cat_name</span> <span class="o">=</span> <span class="n">cat_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.CATPart&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;please open CATIA and corresponding file first, make sure no background CATIA instances are running (one was likely started now)&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Figure below is from version 4.2 - CATIA being used to load the part, create thicknesses, export step.</p>
+<img alt="_images/CatiaFocused_v4.2.JPG" src="_images/CatiaFocused_v4.2.JPG" />
+</section>
 </section>
 
 
@@ -92,14 +109,24 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">4.4.6. CATIA</a><ul>
+<li><a class="reference internal" href="#catia-pre-4-3-requirements">CATIA-pre 4.3 requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="InferenceEngine.html"
                           title="previous chapter"><span class="section-number">4.4.5. </span>Inference Engine</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="Contact.html"
-                          title="next chapter"><span class="section-number">5. </span>Contact</a></p>
+    <p class="topless"><a href="CompoST.html"
+                          title="next chapter"><span class="section-number">5. </span>CompoST</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -129,7 +156,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="Contact.html" title="5. Contact"
+          <a href="CompoST.html" title="5. CompoST"
              >next</a> |</li>
         <li class="right" >
           <a href="InferenceEngine.html" title="4.4.5. Inference Engine"

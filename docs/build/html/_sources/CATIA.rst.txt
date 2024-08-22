@@ -1,5 +1,5 @@
 CATIA
-=================
+=====
 CATIA plug-in requires several bespoke scripts to function. Most of the bespoke CATIA functions are within CATIA.utils.py. 
 
 For step file exports the function ''CATIA_utils.export_step()'' is used:
@@ -23,3 +23,24 @@ The two functions above are used directly by pre_base.py in specific pre-rules.
 	This is manually  edited function that is used to validate GNN functionality. It collects gemetry identified and displays it in CATIA.
 
 
+CATIA-pre 4.3 requirements
+--------------------------
+
+Prior to version 4.3 it was assumed all parts evaluated by SmartDFM have to created in CATIA. Therefore the UI included picking up the appropriate file from live CATIA. This also required contingency for when user forgot to spin-up 
+CATIA. In such cae user was informed, and warned any background versions of CATIA must be closed.
+
+.. code-block:: python
+	
+	try: 
+		CATIA = win32com.client.Dispatch("CATIA.Application")
+		partDocument2 = CATIA.ActiveDocument
+		cat_name = CATIA.ActiveDocument.Name
+		cat_name = cat_name.split(".CATPart")[0]
+	except:
+		print("please open CATIA and corresponding file first, make sure no background CATIA instances are running (one was likely started now)")
+		sys.exit(1)
+
+
+Figure below is from version 4.2 - CATIA being used to load the part, create thicknesses, export step.
+
+.. image:: CatiaFocused_v4.2.*

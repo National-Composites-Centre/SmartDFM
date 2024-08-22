@@ -112,17 +112,24 @@ class p4(FactBase):
             s = []
             allS = [] #all splines
             #assuming all plies from same stack - and ordered reasonably
-            for i in self.StandardLayup.allGeometry[:]:
+            for i in self.StandardLayup.rootElements[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
-                    for ii  in i.plies:
+                    for ii  in i.subComponents:
                         s.append(ii.orientation)
                         #accomodate for piece provided under ply
-                        try:
-                            allS.append(ii.cutPieces[0].splineRelimitation)
-                        except:
-                            #TODO how else can drop-off be defined? accomodate for 
-                            print("ply has no cut-pieces - assumed this ply reaches all the way to the edge for now")
-                            allS.append("edge")
+
+                        #old functions rebuilt for CompoST- not super efficient
+
+                        ID = ii.splineRelimitationRef
+                        IDfound = False
+                        for c in self.StandardLayup.allGeometry:
+                            if type(c) == type(CompositeStandard.Spline()):
+
+                                if c.ID == ID:
+                                    allS.append(c.memberName)
+                                    IDfound = True
+                        if IDfound == False:
+                            print("a referenced ID was not found, this will likely cause issues (eg. in thickness calculations)")
 
             self.max_ply_layup = s
             self.all_relimitations = allS
@@ -270,17 +277,18 @@ class p5(FactBase):
             #unique materials
             w = []
 
-            for i in self.StandardLayup.allGeometry[:]:
+            for i in self.StandardLayup.rootElements[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
-                    for ii  in i.plies:
+                    #TODO check if sequence has materials locally defined as list
+                    
+                    for ii  in i.subComponents:
                         if ii.material not in w:
                             w.append(ii.material)
-                            
+            print("w",w)
             ttmax = 0
 
             mpl = self.max_ply_layup
 
-            #get local thicknesses 
 
             for ii, patch in enumerate(patches):
                 #reverse the order 
@@ -329,10 +337,11 @@ class p5(FactBase):
                                         break
                                 #thickness 
                                 tt = tt + t_mat
-                                
                                 self.material_u = mu
 
+                            
                             elif len(w) > 1:
+                                
                                 #TODO THIS IS WRONG - MULTIMAT NOT WORKING - IT SHOULD NOT ITERATE THROUGH w
                                 mts = []
                                 for matName in w:
@@ -369,10 +378,10 @@ class p5(FactBase):
             #if segments still empty, create a standalone single segment for the full layup
 
             #use the above to also find distance between any combination of patch splines?? 
+
+
             print("p5 run")
 
-            #not to forget database disconnect:
-            #dc_X('NCC',cnnC,crrC)
             self.ite += 1
 
 

@@ -54,10 +54,11 @@ def export_step(d):
     except:
         #this should only happen when the part is not already open, this opens the CATIA part
         #cat_name = ""
-        partDocument1 = CATIA.Documents.Open(part+".CATPart")
+        print(d.path+d.part_name+"."+d.refFileExt)
+        partDocument1 = CATIA.Documents.Open(d.path+d.part_name+"."+d.refFileExt)
         oop = False
         part1 = partDocument1.Part
-        print("document was not found open - standrd path is followed")
+        print("document was not found open - it is opened temporarily for .step generation")
     
     #setting up non-solid modelling
     hybridBodies1 = part1.HybridBodies

@@ -62,6 +62,7 @@ class FactBase(BaseModel):
     """
     StandardLayup: Optional[object] = Field(None)
 
+    refFileExt: Optional[str] = Field(None) #source file extension
     holes: Optional[list] = Field(None) #empty list of holes on default - is fitted with hole class
     layup_sections: Optional[list] = Field(None) #default value is empty class 
     max_ply_layup: Optional[list] = Field(None) #layup with all available plies included (drop-offs considred within layup-sectiosn)

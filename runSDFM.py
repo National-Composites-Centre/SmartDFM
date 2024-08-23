@@ -20,9 +20,9 @@ from time import perf_counter
 import sys
 import os
 
-def sDFM(part,location):
+def sDFM(part,location,extension):
 
-    version = str(4.2)
+    version = str(4.3)
         
     t1_start = perf_counter()
 
@@ -30,7 +30,7 @@ def sDFM(part,location):
     #initiate fact class
     d =  FactBase()
 
-    #here UI to run with CATIA (or elsewhere)
+    d.refFileExt = extension
     d.version = version
     d.part_name =  part #self.lfn.text
     ptemp = location

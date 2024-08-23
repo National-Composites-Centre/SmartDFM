@@ -1,2 +1,2 @@
 x_test_139
-D:\CAD_library_sampling\CompoST_examples\X
+D:/CAD_library_sampling/CompoST_examples/X

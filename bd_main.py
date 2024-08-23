@@ -1,9 +1,5 @@
-
-
-
 #THIS SCRIPT IS COMPLETELY UNUSED IN VERSION 3.0 , in other versions used for UI
-
-'''
+#Changes made in 4.3 remove the requirement for CATIA usage
 
 #backseat designer 1 works with Python only,
 #no KE or Expert system library has been used.
@@ -16,7 +12,7 @@
 import rule_base
 import pre_base
 from fact_base import FactBase, layup
-import win32com.client.dynamic
+#import win32com.client.dynamic
 
 from time import perf_counter
 import sys
@@ -31,16 +27,31 @@ from pydantic import ValidationError
 
 import os
 
+from runSDFM import sDFM
 
+def TK_FS(self):
+    #the random argument is just because kivy passes random stuff during on_press... so...
 
-#try: 
-CATIA = win32com.client.Dispatch("CATIA.Application")
-partDocument2 = CATIA.ActiveDocument
-cat_name = CATIA.ActiveDocument.Name
-cat_name = cat_name.split(".CATPart")[0]
-#except:
-#    cat_name = "Enter name here"
+    #TK file selector
+    import tkinter as tk
+    from tkinter import filedialog
 
+    filetypes = (
+        ('All files', '*.*'),
+        ('catiaFiles','*.CATPart'),
+        ('STEP files','*.stp'),
+    )
+
+    # open-file dialog
+    root = tk.Tk()
+    filename = tk.filedialog.askopenfilename(
+        title='Select a file...',
+        filetypes=filetypes,
+    )
+    self.sef.text = filename
+
+    root.destroy()
+    return(self)
 
 #replacing PySimpleGUI by Kivy
 from kivy.app import App
@@ -52,9 +63,26 @@ from kivy.uix.floatlayout import FloatLayout
 
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
+from kivy.base import runTouchApp
+from kivy.lang import Builder
+from kivy.properties import StringProperty
 
 import subprocess
 import os
+
+
+Builder.load_string('''
+<ScrolllabelLabel>:
+    Label:
+        text: root.text
+        font_size: 12
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+''')
+
+class ScrolllabelLabel(ScrollView):
+    text = StringProperty('')
 
 class MainApp(App):
 
@@ -62,28 +90,26 @@ class MainApp(App):
     def build(self):
         self.layout = FloatLayout()
 
-        #txt input
-        self.lfn = TextInput(text=cat_name,size_hint=(0.75,0.05),pos =(120, 650))
+
         #folder selection
-        self.sef = TextInput(text='C:\\code\\fls',size_hint=(0.4,0.05),pos =(160, 600))
+        self.sef = TextInput(text='',size_hint=(0.5,0.05),pos =(120, 650))
 
-        self.b1 = Button(text='Select', on_press=self.select,size_hint=(0.20,0.05),pos =(380, 600))
-        self.b2 = Button(text='Check my design', on_press=self.submit,size_hint=(0.4,0.05),pos =(15,550))
+        self.b1 = Button(text='Select', on_press=self.TK_FS_,size_hint=(0.22,0.05),pos =(380, 650))
+        self.b2 = Button(text='Check my design', on_press=self.submit,size_hint=(0.4,0.05),pos =(15,600))
 
-        self.l1 = Label(text='File name:',halign = 'left',pos =(5,650),size_hint = (0.2,0.05))
+        #Looks for any file 
+        self.l2 = Label(text='Select file:',halign = 'left',pos =(5,650),size_hint=(0.2,0.05))
 
-        #This is to be resolved, the equivalent functionality to PySImpleGui not easily available
-        self.l2 = Label(text='Select folder (TBD!):',halign = 'left',pos =(10,600),size_hint=(0.3,0.05))
+        #self.t66 = Label(text='If using CATIA file, and .step does not exist yet, make sure CATIA is running!',halign = 'left',size_hint=(0.8,0.05),pos =(5, 550))
 
-        self.scrl = ScrollView(size_hint=(0.95, 0.75), pos =(10,10))
-        self.t3 = TextInput(text='xxxxxx\n',size_hint=(1,1))
+        self.scrl = ScrollView(size_hint=(0.95, 0.8), pos =(10,10))
+        self.t3 = ScrolllabelLabel(text='If using CATIA file, and .step does not exist yet, make sure CATIA is running!\n',size_hint=(1,1))#,multiline=True)
         self.scrl.add_widget(self.t3)
 
-        self.layout.add_widget(self.l1)
         self.layout.add_widget(self.l2)
-        self.layout.add_widget(self.lfn)
         self.layout.add_widget(self.sef)
         self.layout.add_widget(self.b1)
+        #self.layout.add_widget(self.t66)
         self.layout.add_widget(self.b2)
         self.layout.add_widget(self.scrl)
         return(self.layout)
@@ -92,49 +118,48 @@ class MainApp(App):
         self.t3.text = "evaluating"
 
         #here UI to run with CATIA (or elsewhere)
+        input_text = self.sef.text
 
-        part_name = self.lfn.text
-        part_folder = self.sef.text
-        pnf = part_name+"\n"+part_folder
+        if input_text == "":
+            print("please select a file")
+        else:
+            np = os.path.normpath(input_text)
+            np = np.split(os.sep)
 
-        with open("temp_file.txt","w") as tfl:
-            tfl.write(pnf)
-
-
-        #turn this into cmd....
-
-        #workaround because Kivy checks variables inside it's functions and prevents code that involves exec() from running ... effectively
-        #no more reasonable work-around found
-        #
-
-        try:
-            os.remove(part_folder+"\\"+part_name+"_report.txt")
-        except:
-            print("new report is being generated")
-
-
-        #change location!!
-        subprocess.run("conda run -n sdc_kivy_3 python C:\\code\\smartdfm_kivy\\runSDFM.py") 
-
-
-
-        error = 1
-        while error == 1:
+            part = np[len(np)-1]
             
-            try:
-                print(part_folder+"\\"+part_name+"_report.txt")
-                with open(part_folder+"\\"+part_name+"_report.txt", "r") as report:
-                    self.t3.text = report.read()
-                error = 2
-            except:
-                pass
+            extension = part.split(".")[part.count(".")]
+            part = part[:-(len(extension)+1)]
+     
+            folder = input_text[:-(len(part)+len(extension)+1)]
+
+            acceptable_extensions = ["CATPart","stp","STP","STEP",] #here anyone can add acceptable extensions based on their CAD software (that allow for step gen.)
+            if extension in acceptable_extensions:
+                sDFM(part,folder,extension)
+                error = 1
+                while error == 1:
+                    
+                    try:
+                        print(folder+"\\"+part+"_report.txt")
+                        with open(folder+"\\"+part+"_report.txt", "r") as report:
+                            self.t3.text = report.read()
+                        error = 2
+                    except:
+                        pass
+            else:
+                print("the extension of given file is currently not supported")
+
+
 
 
     def select(self,obj):
         print("(currently not functional, please edit folder manually)")
         
-
+    
+    def TK_FS_(self,obj):
+        self = TK_FS(self)
+        return(self)
+    
 MainApp().run()
 
 
-'''

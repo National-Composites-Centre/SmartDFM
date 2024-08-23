@@ -12,6 +12,6 @@ except:
     sys.exit(1)
 
 #EDIT THIS:
-location = """D:\CAD_library_sampling\TestCad_SmartDFM\X"""
+location = """D:\CAD_library_sampling\CompoST_examples\X"""
 part = cat_name
 sDFM(part, location)

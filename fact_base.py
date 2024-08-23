@@ -4,6 +4,8 @@ from typing import Optional
 
 import CompositeStandard
 
+#Some of the classes below might be obsolete due to usage of CompositeStandard which houses many of these variables
+
 class vert(BaseModel):
     x: float = Field(None)
     y: float = Field(None)
@@ -60,6 +62,7 @@ class FactBase(BaseModel):
     """
     StandardLayup: Optional[object] = Field(None)
 
+    refFileExt: Optional[str] = Field(None) #source file extension
     holes: Optional[list] = Field(None) #empty list of holes on default - is fitted with hole class
     layup_sections: Optional[list] = Field(None) #default value is empty class 
     max_ply_layup: Optional[list] = Field(None) #layup with all available plies included (drop-offs considred within layup-sectiosn)

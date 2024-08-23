@@ -66,48 +66,7 @@ class pXX(FactBase):
             #print out for troubleshooting purposes
             print("pX run")
         return(self)
-
-class p1(FactBase):
-    #checks if layup file exists
-
-    #Required variables
-    part_name: str = Field()
-    path: str = Field()
-
-    def __init__(self, d: FactBase):
-        self = FactBase.__init__(self, **d.__dict__)
-
-    def solve(self):
-        if self.layup_file == None:
-            if os.path.exists(self.path+self.part_name+".txt"):
-                self.layup_file = self.path+self.part_name+".txt"
-                self.ite += 1
-            else:
-                self.report.check_issues += "\nLayup file not found, make sure that .txt file with corresponding name is located in specified folder.\n"
-            print("p1 run")
-        return(self)
-
-class p2(FactBase):
-    #Variables to be obtained
-    step_file: bool = Field(None)
-
-    #Required variables
-    part_name: str = Field()
-    path: str = Field()
-
-    def __init__(self, d: FactBase):
-        self = FactBase.__init__(self, **d.__dict__)
-
-    def solve(self):
-        #Verify .stp file is available
-        if self.step_file == None:
-            if os.path.exists(self.path+self.part_name+".stp"):
-                self.step_file = True
-            else:
-                self.step_file = False
-            print("p2 run")
-            self.ite += 1
-        return(self)    
+   
     
 class p3(FactBase):
 
@@ -134,6 +93,7 @@ class p3(FactBase):
                 else:
                     self.runtime_error += "Layup file not found, or not stored in correct standard."
                 self.StandardLayup = CompositeStandard.CompositeDB(BaseModel) #empty layup when layup missing
+                #TODO Fix the exception run!!
 
             self.ite += 1  
             print("p3 run")          
@@ -152,17 +112,24 @@ class p4(FactBase):
             s = []
             allS = [] #all splines
             #assuming all plies from same stack - and ordered reasonably
-            for i in self.StandardLayup.allGeometry[:]:
+            for i in self.StandardLayup.rootElements[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
-                    for ii  in i.plies:
+                    for ii  in i.subComponents:
                         s.append(ii.orientation)
                         #accomodate for piece provided under ply
-                        try:
-                            allS.append(ii.cutPieces[0].splineRelimitation)
-                        except:
-                            #TODO how else can drop-off be defined? accomodate for 
-                            print("ply has no cut-pieces - assumed this ply reaches all the way to the edge for now")
-                            allS.append("edge")
+
+                        #old functions rebuilt for CompoST- not super efficient
+
+                        ID = ii.splineRelimitationRef
+                        IDfound = False
+                        for c in self.StandardLayup.allGeometry:
+                            if type(c) == type(CompositeStandard.Spline()):
+
+                                if c.ID == ID:
+                                    allS.append(c.memberName)
+                                    IDfound = True
+                        if IDfound == False:
+                            print("a referenced ID was not found, this will likely cause issues (eg. in thickness calculations)")
 
             self.max_ply_layup = s
             self.all_relimitations = allS
@@ -216,7 +183,7 @@ class p5(FactBase):
                         i.length =ln
 
                         #is there a need for 'edge' to still be separate ? #TODO
-
+            self.layup_splines = UniqueSplines
             #pathces allows for number of groups for drop-ffs
             #inside of each patch, sits list of splines (when cross overs come, it is going to be spline amalgamations)
             patches = [[]]
@@ -310,17 +277,18 @@ class p5(FactBase):
             #unique materials
             w = []
 
-            for i in self.StandardLayup.allGeometry[:]:
+            for i in self.StandardLayup.rootElements[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
-                    for ii  in i.plies:
+                    #TODO check if sequence has materials locally defined as list
+                    
+                    for ii  in i.subComponents:
                         if ii.material not in w:
                             w.append(ii.material)
-                            
+            print("w",w)
             ttmax = 0
 
             mpl = self.max_ply_layup
 
-            #get local thicknesses 
 
             for ii, patch in enumerate(patches):
                 #reverse the order 
@@ -369,10 +337,11 @@ class p5(FactBase):
                                         break
                                 #thickness 
                                 tt = tt + t_mat
-                                
                                 self.material_u = mu
 
+                            
                             elif len(w) > 1:
+                                
                                 #TODO THIS IS WRONG - MULTIMAT NOT WORKING - IT SHOULD NOT ITERATE THROUGH w
                                 mts = []
                                 for matName in w:
@@ -409,10 +378,10 @@ class p5(FactBase):
             #if segments still empty, create a standalone single segment for the full layup
 
             #use the above to also find distance between any combination of patch splines?? 
+
+
             print("p5 run")
 
-            #not to forget database disconnect:
-            #dc_X('NCC',cnnC,crrC)
             self.ite += 1
 
 
@@ -421,9 +390,6 @@ class p5(FactBase):
 
 class p6(FactBase):
     #finds the nearest distance between splines
-
-    #DOES NOT WORK WITHOUT EDGE DEFINITION -- all the splines overlap
-        #currently CATIA needs to be used to obtain this ^^
 
     #Required variables
     layup_sections: conlist(object, min_length=1)
@@ -508,8 +474,8 @@ class p6(FactBase):
 
             else:
                 #This account for situation where no drop-offs were recorded, prevents
-                #re-run of p5
-                self.layup_sections[i].mind = 0
+                #re-run of p6
+                self.layup_sections[i].mind = 999 # high number to prevent triggering r144
 
             print("p6 run")
             self.ite += 1
@@ -820,8 +786,13 @@ class p11(FactBase):
                 self.step_file = self.path+self.part_name+".stp"
             else:
                 #if step file does not exist, create a step file
-                export_step(self)
-                self.step_file = self.path+self.part_name+".stp"
+                if self.refFileExt == "CATPart":
+                    export_step(self)
+                    self.step_file = self.path+self.part_name+".stp"
+                else:
+                    print("TODO==> other extensions")
+
+                    #TODO for other sofware other step generations would be required here
 
             print("p11 run")
             self.ite += 1
@@ -869,6 +840,7 @@ class p12(FactBase):
         return(self)
     
 class p13(FactBase):
+    #Currently done as part of p5 
 
     #Required variables
     part_name: str = Field()

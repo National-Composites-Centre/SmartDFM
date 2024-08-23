@@ -276,7 +276,6 @@ class r144(FactBase):
         if self.load_direction == None:
 
             #if no load direction is suggested 
-            print("temp counter:",self.layup_sections.count())
             for x in self.layup_sections:
                 #rule suggests 5.1 mm limit
                 if x.mind < 5.1:
@@ -381,7 +380,7 @@ class r151(FactBase):
 
             count = len(s.sequence)
             #if top or bottom layer are not +-45 
-            if (s.sequence[0] != (45 or -45)) or (s.sequence[count-1] != (45 or -45)):
+            if (s.sequence[0] != 45 and s.sequence[0] != -45) or (s.sequence[count-1] != 45 and s.sequence[count-1] != -45):
                 stre = "Outermost plies should typically be +45° or –45° .\n"
                 #avoid duplication
                 if stre not in self.report.suggested_checks:
@@ -514,22 +513,21 @@ class r83(FactBase):
 
     def solve(self):
         #At least the two most external plies shall be continuous
-        print(self.layup_splines)
         
         stre = "At least the two most external plies shall be continuous. This appears not to be the case.\n"
         #avoid duplication
         if stre not in self.report.design_errors:
             if self.layup_splines[0] != "'f'":
-                print("1")
+                #print("1")
                 self.report.design_errors += "\n"+stre+"\n" 
             elif self.layup_splines[1] != "'f'":
-                print("2")
+                #print("2")
                 self.report.design_errors += "\n"+stre+"\n" 
             elif self.layup_splines[int(len(self.layup_splines)-1)] != "'f'":
-                print("3")
+                #print("3")
                 self.report.design_errors += "\n"+stre+"\n" 
             elif self.layup_splines[int(len(self.layup_splines)-2)] != "'f'":
-                print("4")
+                #print("4")
                 self.report.design_errors += "\n"+stre+"\n" 
 
 
@@ -615,13 +613,13 @@ class r128(FactBase):
                 i = 0
                 while i < np.size(ls.pt_list,0):
                     #if any point on any spline is closer than radius from hole mid-point it is likely ply is being terminated at fastener location
-                    dist = math.sqrt((h.position[0]-ls.pt_list[i,0])**2+(h.position[1]-ls.pt_list[i,1])**2+(h.position[2]-ls.pt_list[i,2])**2)
+                    dist = math.sqrt((h.position[0]-ls.pt_list[i].x)**2+(h.position[1]-ls.pt_list[i].y)**2+(h.position[2]-ls.pt_list[i].z)**2)
                     #1% larger hole for corner drop-offs
                     if dist < h.radius*1.01:
-                        print(h.radius)
-                        print(dist)
-                        print(h.position)
-                        print(ls.pt_list[i,:])
+                        #print(h.radius)
+                        #print(dist)
+                        #print(h.position)
+                        #print(ls.pt_list[i,:])
                         stre = "Never terminate plies in fastener patterns.\n"
                         stre += "Spline "+str(ls.sp_def)+ " crosses through hole located at : "+str(h.position)+".\n"
                         #avoid duplication
@@ -660,7 +658,7 @@ class r146(FactBase):
                     sm45_1 += 1
                 if ls.sequence[cnt-1-i] == 45:
                     sp45_2 += 1
-                elif ls.sequence[cnt-1-i == -45]:
+                elif ls.sequence[cnt-1-i] == -45:
                     sm45_2 += 1
                 i = i + 1
             
@@ -736,7 +734,8 @@ class r139(FactBase):
         #Ply drop-offs should not exceed 0.010 inch (0.25mm) thick per drop for unidirectional. 139
         #Ply drop-offs should not exceed  0.015 inch (0.38 mm) thick per drop for fabric. 141
         
-
+        
+        #unique
         ptch  = []
         for ls in self.layup_sections:
             if ls.patch not in ptch:
@@ -751,27 +750,23 @@ class r139(FactBase):
             c2 = 0
             c1 = 0
             for ls in self.layup_sections:
-                
-                #print("len local ", ls.sp_len)
-                
+                spline_prev = ls.sp_def
                 if c1 != 0:
                     c2 = c1
                 c1 = ls.local_thickness
-                spline_prev = ls.sp_def
+                #spline_prev = ls.sp_def
 
                 if c2 != 0:
                     dif = abs(c2-c1)
 
                     if dif > 0.38:
-                        stre = "Drop-off at one location should not 0.38mm."
+                        stre = "Drop-off at one location should not exceed 0.38mm."
                         stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
                         #suggested check as it is minor once balance and symmetry has been considered 
                         #avoid duplication
                         if stre not in self.report.suggested_checks:
                             self.report.suggested_checks += "\n"+stre+"\n"
                         
-
-
                     elif dif > 0.25:
                         #here suggestion only as not sure if UD
                         stre = "Drop-off at one location should not exceed 0.25mm for unidirectional and 0.38 for woven fabric."
@@ -863,7 +858,7 @@ class r401(FactBase):
                 self.report.suggested_checks += stre
         #Potentially fix: this sometimes considers other side of same radius different radius
         #^^ add a proximity fileter?
-        print(self.uniform_material, "uniform material")
+        #print(self.uniform_material, "uniform material")
         return(self)
     
 class r402(FactBase):

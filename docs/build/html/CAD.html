@@ -1,0 +1,181 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4.4.6. CAD &#8212; SmartDFM 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="5. CompoST" href="CompoST.html" />
+    <link rel="prev" title="4.4.5. Inference Engine" href="InferenceEngine.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="CompoST.html" title="5. CompoST"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="InferenceEngine.html" title="4.4.5. Inference Engine"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" accesskey="U"><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.6. </span>CAD</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cad">
+<h1><span class="section-number">4.4.6. </span>CAD<a class="headerlink" href="#cad" title="Permalink to this heading">¶</a></h1>
+<p>SmartDFM is build to be software agnostic. However, initial versions relied on CATIA to generate step file. From 4.3 onwards the SmartDFM can be run with .stp file as input. If user wishes to integrate other CAD software the same way
+CATIA is integrated, they can follow the <cite>CATIA_utils.py</cite> described below. Once the equivalent .step generation tools have been created they can be launched from <cite>p11</cite> instead of <cite>CATIA_utils.export_step</cite>. <cite>bd_main.py</cite> will require
+editing of <cite>acceptable_extensions</cite> variable, for new file extensions to be accepted at launch.</p>
+<section id="catia">
+<h2>CATIA<a class="headerlink" href="#catia" title="Permalink to this heading">¶</a></h2>
+<p>CATIA plug-in requires several bespoke scripts to function. Most of the bespoke CATIA functions are within CATIA.utils.py.</p>
+<p>For step file exports the function ‘’CATIA_utils.export_step()’’ is used:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="CATIA_utils.export_step">
+<span class="sig-prename descclassname"><span class="pre">CATIA_utils.</span></span><span class="sig-name descname"><span class="pre">export_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CATIA_utils.export_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows for generation of thicknesses based on tool surface and defined layup. Once the solid was created part will be saved as .CATpart and .stp. For more details refer to annotations in code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> – DesignVariables class, refer to <a class="reference internal" href="FactBase.html"><span class="doc">Fact Base</span></a> for details</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="CATIA_utils.hole_loc">
+<span class="sig-prename descclassname"><span class="pre">CATIA_utils.</span></span><span class="sig-name descname"><span class="pre">hole_loc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CATIA_utils.hole_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is only  used when GNN for hole identificaiton is not available. It requires holes geometry to be defined in dedicated geometry set in CATIA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>part</strong> – path to the part store as string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The two functions above are used directly by pre_base.py in specific pre-rules.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="CATIA_utils.GNN_validation">
+<span class="sig-prename descclassname"><span class="pre">CATIA_utils.</span></span><span class="sig-name descname"><span class="pre">GNN_validation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CATIA_utils.GNN_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is manually  edited function that is used to validate GNN functionality. It collects gemetry identified and displays it in CATIA.</p>
+</dd></dl>
+
+</section>
+<section id="catia-pre-4-3-requirements">
+<h2>CATIA-pre 4.3 requirements<a class="headerlink" href="#catia-pre-4-3-requirements" title="Permalink to this heading">¶</a></h2>
+<p>Prior to version 4.3 it was assumed all parts evaluated by SmartDFM have to created in CATIA. Therefore the UI included picking up the appropriate file from live CATIA. This also required contingency for when user forgot to spin-up
+CATIA. In such cae user was informed, and warned any background versions of CATIA must be closed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+        <span class="n">CATIA</span> <span class="o">=</span> <span class="n">win32com</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Dispatch</span><span class="p">(</span><span class="s2">&quot;CATIA.Application&quot;</span><span class="p">)</span>
+        <span class="n">partDocument2</span> <span class="o">=</span> <span class="n">CATIA</span><span class="o">.</span><span class="n">ActiveDocument</span>
+        <span class="n">cat_name</span> <span class="o">=</span> <span class="n">CATIA</span><span class="o">.</span><span class="n">ActiveDocument</span><span class="o">.</span><span class="n">Name</span>
+        <span class="n">cat_name</span> <span class="o">=</span> <span class="n">cat_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.CATPart&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;please open CATIA and corresponding file first, make sure no background CATIA instances are running (one was likely started now)&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Figure below is from version 4.2 - CATIA being used to load the part, create thicknesses, export step.</p>
+<img alt="_images/CatiaFocused_v4.2.JPG" src="_images/CatiaFocused_v4.2.JPG" />
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">4.4.6. CAD</a><ul>
+<li><a class="reference internal" href="#catia">CATIA</a></li>
+<li><a class="reference internal" href="#catia-pre-4-3-requirements">CATIA-pre 4.3 requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="InferenceEngine.html"
+                          title="previous chapter"><span class="section-number">4.4.5. </span>Inference Engine</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="CompoST.html"
+                          title="next chapter"><span class="section-number">5. </span>CompoST</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/CAD.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="CompoST.html" title="5. CompoST"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="InferenceEngine.html" title="4.4.5. Inference Engine"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="Developers.html" ><span class="section-number">4. </span>Development notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">4.4.6. </span>CAD</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jakub Kucera.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

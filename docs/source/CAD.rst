@@ -1,5 +1,13 @@
+CAD
+===
+
+SmartDFM is build to be software agnostic. However, initial versions relied on CATIA to generate step file. From 4.3 onwards the SmartDFM can be run with .stp file as input. If user wishes to integrate other CAD software the same way
+CATIA is integrated, they can follow the `CATIA_utils.py` described below. Once the equivalent .step generation tools have been created they can be launched from `p11` instead of `CATIA_utils.export_step`. `bd_main.py` will require 
+editing of `acceptable_extensions` variable, for new file extensions to be accepted at launch.
+
+
 CATIA
-=====
+-----
 CATIA plug-in requires several bespoke scripts to function. Most of the bespoke CATIA functions are within CATIA.utils.py. 
 
 For step file exports the function ''CATIA_utils.export_step()'' is used:

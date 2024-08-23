@@ -51,7 +51,7 @@ components of the system
 
 	InferenceEngine
 	
-	CATIA
+	CAD
 
 
 

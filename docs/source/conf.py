@@ -9,7 +9,7 @@
 project = 'SmartDFM'
 copyright = '2023, Jakub Kucera'
 author = 'Jakub Kucera'
-release = '1.0'
+release = '4.3'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

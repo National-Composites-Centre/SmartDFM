@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>3. Usage &#8212; SmartDFM 4.3 documentation</title>
+    <title>8. User Interface &#8212; SmartDFM 4.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -19,8 +19,7 @@
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="4. Development notes" href="Developers.html" />
-    <link rel="prev" title="1. Introduction" href="Introduction.html" />
+    <link rel="prev" title="7. Versions" href="Versions.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -33,13 +32,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="Developers.html" title="4. Development notes"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="Introduction.html" title="1. Introduction"
+          <a href="Versions.html" title="7. Versions"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 4.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>Usage</a></li> 
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">8. </span>User Interface</a></li> 
       </ul>
     </div>  
 
@@ -48,23 +44,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="usage">
-<h1><span class="section-number">3. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h1>
-<p>This page provides information to users of the application. If you plan to make changes to the application itself, please refer to developer guide: <a class="reference internal" href="Developers.html"><span class="doc">Development notes</span></a></p>
-<section id="installation">
-<span id="id1"></span><h2><span class="section-number">3.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
-<p>[CURRENTLY NO USER-FRIENDLY INSTALLATION EXISTS visit <a class="reference internal" href="Developers.html"><span class="doc">Development notes</span></a> for developer installations]</p>
-<p>[below is yet to be developed]</p>
-<p>To use SmartDFM, ….:</p>
-<p>– GNN code needs to be provided
-– (troubleshooting add for missing GNN models)
-– (the paths in configs in WS2.0 need work)</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>?
-</pre></div>
-</div>
-</section>
-<section id="example-part-execution">
-<h2><span class="section-number">3.2. </span>Example part execution<a class="headerlink" href="#example-part-execution" title="Permalink to this heading">¶</a></h2>
+  <section id="user-interface">
+<h1><span class="section-number">8. </span>User Interface<a class="headerlink" href="#user-interface" title="Permalink to this heading">¶</a></h1>
+<p>Originally PySimpleGUI was used to generate the UI; old releases are using this. However, PySimpleGUI become commercial software and hence it is not appropriate to Open-Source project.
+Therefore transition was made to Kivy UI. The transition was quite cumbersome,as Kivy uses different style of UI architecture.</p>
+<section id="outstanding-issues">
+<h2><span class="section-number">8.1. </span>Outstanding issues<a class="headerlink" href="#outstanding-issues" title="Permalink to this heading">¶</a></h2>
+<p>Kivy is less suitable for working with multiple windows and pop-ups. Therefore multiple windows are avoided and pop-ups are done separately using tkinter Python library.</p>
+<p>Kivy initially caused issues with packaging LD into executable, to be used directly as an integrated button in CATIA. Therefore, currently standalone executable is not available.</p>
 </section>
 </section>
 
@@ -78,9 +65,8 @@
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">3. Usage</a><ul>
-<li><a class="reference internal" href="#installation">3.1. Installation</a></li>
-<li><a class="reference internal" href="#example-part-execution">3.2. Example part execution</a></li>
+<li><a class="reference internal" href="#">8. User Interface</a><ul>
+<li><a class="reference internal" href="#outstanding-issues">8.1. Outstanding issues</a></li>
 </ul>
 </li>
 </ul>
@@ -88,18 +74,13 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="Introduction.html"
-                          title="previous chapter"><span class="section-number">1. </span>Introduction</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="Developers.html"
-                          title="next chapter"><span class="section-number">4. </span>Development notes</a></p>
+    <p class="topless"><a href="Versions.html"
+                          title="previous chapter"><span class="section-number">7. </span>Versions</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/usage.rst.txt"
+      <li><a href="_sources/User Interface.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -124,13 +105,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="Developers.html" title="4. Development notes"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="Introduction.html" title="1. Introduction"
+          <a href="Versions.html" title="7. Versions"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">SmartDFM 4.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><span class="section-number">3. </span>Usage</a></li> 
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">8. </span>User Interface</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -112,7 +112,7 @@ class p4(FactBase):
             s = []
             allS = [] #all splines
             #assuming all plies from same stack - and ordered reasonably
-            for i in self.StandardLayup.rootElements[:]:
+            for i in self.StandardLayup.allComposite[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
                     for ii  in i.subComponents:
                         s.append(ii.orientation)
@@ -277,7 +277,7 @@ class p5(FactBase):
             #unique materials
             w = []
 
-            for i in self.StandardLayup.rootElements[:]:
+            for i in self.StandardLayup.allComposite[:]:
                 if type(i) == type(CompositeStandard.Sequence()):
                     #TODO check if sequence has materials locally defined as list
                     
@@ -348,7 +348,7 @@ class p5(FactBase):
                                     #find thickness of material layer
                                     for i in self.StandardLayup.allMaterials[:]:
                                         if i.materialName == matName:
-                                            t_mat = i.thickness
+                                            t_mat = float(i.thickness)
                                             mu = i
 
                                     tt = tt + t_mat

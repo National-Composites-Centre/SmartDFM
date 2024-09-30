@@ -94,25 +94,20 @@ def sDFM(part,location,extension):
             #skipping rules that don't apply.
             #Outter loop error handling actually covers for code errors in individual 
             #rules.
+
+            #is this too brute force ?
+
             try:
-                    #is this too brute force ?
                 try:
                     d = i(d).solve()
 
                 except ValidationError as e:
 
-                    #print(e)
-                    #print("Rule "+str(i)+" not checked")
                     stre = "Rule "+str(i)+" not checked due to missing information."
-                    #consider printing some part of the actual error?
                     d.report.check_issues += "\n"+stre +"\n"
             
             except Exception as er:
-
-                #print(er)
-                #print("Rule "+str(i)+" not checked")
                 stre = "Rule "+str(i)+" not checked due to DFM tool error."
-                #consider printing some part of the actual error?
                 d.report.check_issues += "\n"+stre +"\n"
                 
     t1_stop = perf_counter()

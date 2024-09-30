@@ -24,6 +24,8 @@ Welcome to SmartDFM's documentation!
    Versions
    
    User Interface
+   
+   Troubleshooting
 
 .. note::
 

@@ -36,7 +36,7 @@ The developments to pre_base.py are quite varied, but here are few points that s
 
 
 
-components of the system
+Components of the system
 ------------------------
 .. toctree::
 	:maxdepth: 1
@@ -54,4 +54,26 @@ components of the system
 	CAD
 
 
+Error handling
+--------------
 
+It is undesirable for the whole SmartDFM to fail when specific rule or pre-rule fails. However, user should know that an error occured, as not to asume certain rules were followed correctly.
+
+Therefore when running rules 'try' clauses are used, and when error occurs the likely cause of the error along with the rule number are recorded. This is later provided as part of the SmartDFM report.
+
+The following code shows the implementation of this for rules, for pre-rules this is simpler as the result of an error will be missing information, which is flagged under rules errors.
+
+.. code-block:: Python
+
+	try:
+		try:
+			d = i(d).solve()
+
+		except ValidationError as e:
+
+			stre = "Rule "+str(i)+" not checked due to missing information."
+			d.report.check_issues += "\n"+stre +"\n"
+	
+	except Exception as er:
+		stre = "Rule "+str(i)+" not checked due to DFM tool error."
+		d.report.check_issues += "\n"+stre +"\n"

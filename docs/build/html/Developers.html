@@ -77,7 +77,7 @@
 </ul>
 </section>
 <section id="components-of-the-system">
-<h2><span class="section-number">4.4. </span>components of the system<a class="headerlink" href="#components-of-the-system" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">4.4. </span>Components of the system<a class="headerlink" href="#components-of-the-system" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="FactBase.html">4.4.1. Fact Base</a></li>
@@ -87,6 +87,26 @@
 <li class="toctree-l1"><a class="reference internal" href="InferenceEngine.html">4.4.5. Inference Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CAD.html">4.4.6. CAD</a></li>
 </ul>
+</div>
+</section>
+<section id="error-handling">
+<h2><span class="section-number">4.5. </span>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this heading">¶</a></h2>
+<p>It is undesirable for the whole SmartDFM to fail when specific rule or pre-rule fails. However, user should know that an error occured, as not to asume certain rules were followed correctly.</p>
+<p>Therefore when running rules ‘try’ clauses are used, and when error occurs the likely cause of the error along with the rule number are recorded. This is later provided as part of the SmartDFM report.</p>
+<p>The following code shows the implementation of this for rules, for pre-rules this is simpler as the result of an error will be missing information, which is flagged under rules errors.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">i</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+
+                <span class="n">stre</span> <span class="o">=</span> <span class="s2">&quot;Rule &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; not checked due to missing information.&quot;</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">check_issues</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">stre</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">er</span><span class="p">:</span>
+        <span class="n">stre</span> <span class="o">=</span> <span class="s2">&quot;Rule &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; not checked due to DFM tool error.&quot;</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">check_issues</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">stre</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</pre></div>
 </div>
 </section>
 </section>
@@ -105,7 +125,8 @@
 <li><a class="reference internal" href="#preparation">4.1. Preparation</a></li>
 <li><a class="reference internal" href="#reworking-and-adding-rules">4.2. Reworking and adding rules</a></li>
 <li><a class="reference internal" href="#pre-rules-development">4.3. Pre-rules development</a></li>
-<li><a class="reference internal" href="#components-of-the-system">4.4. components of the system</a></li>
+<li><a class="reference internal" href="#components-of-the-system">4.4. Components of the system</a></li>
+<li><a class="reference internal" href="#error-handling">4.5. Error handling</a></li>
 </ul>
 </li>
 </ul>

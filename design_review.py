@@ -10,7 +10,7 @@ Created on Mon Oct 17 11:33:10 2022
 import pandas as pd
 import numpy as np
 
-from step_features import flange_data
+from SmartDFM.step_features import flange_data
 
 
 def step_check(step_file,collection):

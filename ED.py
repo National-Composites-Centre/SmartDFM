@@ -2,7 +2,7 @@
 
 import numpy as np
 from numpy.linalg import norm
-from CATIA_utils import hole_loc
+from SmartDFM.CATIA_utils import hole_loc
 import math
 import time
 

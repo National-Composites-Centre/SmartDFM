@@ -1,26 +1,18 @@
 
        
-import rule_base
-import pre_base
-from fact_base import FactBase, layup
+import SmartDFM.rule_base as rule_base
+import SmartDFM.pre_base as pre_base
+from SmartDFM.fact_base import FactBase, layup
 import win32com.client.dynamic
-
-from time import perf_counter
-import sys
 
 #Pydantic library is used to validate inputs to pre-rules and rules
 from pydantic import ValidationError
-
-import rule_base
-import pre_base
-from fact_base import FactBase, layup
-import win32com.client.dynamic
 
 from time import perf_counter
 import sys
 import os
 
-def sDFM(part,location,extension):
+def sDFM(part,location,extension=""):
 
     version = str(4.3)
         
@@ -40,7 +32,9 @@ def sDFM(part,location,extension):
     p = pre_base
 
     #bit cured #TODO make this auto generate?
-    active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p9,p.p10,p.p11,p.p12,p.p14,p.p15,p.p16] 
+    active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p10,p.p11,p.p12,p.p14,p.p15,p.p16] 
+
+    #p9 --- holes now disabled -- not expected in the part in question (CORE only)
 
     #p1 and p2 removed at 4.1 - layup file and step files checked when first pre-rule requires them instead
 
@@ -52,7 +46,8 @@ def sDFM(part,location,extension):
 
     #these rules are numbered according ty Bryn's design rules document
     r = rule_base
-    active_rules =  [r.r35,r.r36,r.r71,r.r83,r.r85,r.r86,r.r91,r.r92,r.r95,r.r128,r.r133,r.r134,r.r135,r.r130,r.r139,r.r144,r.r146,r.r151,r.r166,r.r400,r.r401,r.r402]
+    #active_rules =  [r.r35,r.r36,r.r71,r.r83,r.r85,r.r86,r.r91,r.r92,r.r95,r.r128,r.r133,r.r134,r.r135,r.r130,r.r139,r.r144,r.r146,r.r151,r.r166,r.r400,r.r401,r.r402]
+    active_rules =  [r.r139]
 
     #78 temporarily disabled
 
@@ -79,9 +74,10 @@ def sDFM(part,location,extension):
                 d = i(d).solve()
         
             except ValidationError as e:
-                #print(e)
+                print(e)
                 pass
             p = 1
+        
         print("d.ite",d.ite)
 
     #Rules running only once, rule results are text, should not affect the ability of other rules to be checked.
@@ -97,18 +93,19 @@ def sDFM(part,location,extension):
 
             #is this too brute force ?
 
-            try:
-                try:
-                    d = i(d).solve()
+            # try:
+            #     try:
+            d = i(d).solve()
 
-                except ValidationError as e:
-
-                    stre = "Rule "+str(i)+" not checked due to missing information."
-                    d.report.check_issues += "\n"+stre +"\n"
+            #     except ValidationError as e:
+                    
+            #         stre = "Rule "+str(i)+" not checked due to missing information."
+            #         d.report.check_issues += "\n"+stre +"\n"
             
-            except Exception as er:
-                stre = "Rule "+str(i)+" not checked due to DFM tool error."
-                d.report.check_issues += "\n"+stre +"\n"
+            # except Exception as er:
+                
+            #     stre = "Rule "+str(i)+" not checked due to DFM tool error."
+            #     d.report.check_issues += "\n"+stre +"\n"
                 
     t1_stop = perf_counter()
     lapsed = t1_stop-t1_start

@@ -1,9 +1,9 @@
 import math
 import time
 import numpy as np
-from step_utils import step_reclassification, circ_reclass, step_circle
+from SmartDFM.step_utils import step_reclassification, circ_reclass, step_circle
 from time import perf_counter
-from fact_base import hole
+from SmartDFM.fact_base import hole
 
     
 

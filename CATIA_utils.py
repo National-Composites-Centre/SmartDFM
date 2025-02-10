@@ -5,7 +5,7 @@ Created on Mon Sep  5 09:31:17 2022
 @author: jakub.kucera
 """
 import win32com.client.dynamic
-from vecEX2_C import wrmmm
+from SmartDFM.vecEX2_C import wrmmm
 import numpy as np
 import win32com.client.dynamic
 import os

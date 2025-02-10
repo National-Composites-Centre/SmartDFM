@@ -5,9 +5,10 @@
 
 from pydantic import BaseModel, Field, conlist
 import math
-from fact_base import FactBase, layup, report
-from layup_utils import symmetry, balance
+from SmartDFM.fact_base import FactBase, layup, report
+from SmartDFM.layup_utils import symmetry, balance
 import numpy as np
+import CompositeStandard as cs
 
 #rXX is an example/template rule, explaining typical features of how the rules are structured
 class rXX(FactBase):
@@ -502,33 +503,45 @@ class r133(FactBase):
         return(self)
     
 class r83(FactBase):
-
-    #required variables
-    layup_splines: conlist(object, min_length=2)
     
-    
+    StandardLayup: object
 
     def __init__(self, d: FactBase):
         self = FactBase.__init__(self, **d.__dict__)
 
     def solve(self):
         #At least the two most external plies shall be continuous
-        
+
         stre = "At least the two most external plies shall be continuous. This appears not to be the case.\n"
         #avoid duplication
         if stre not in self.report.design_errors:
-            if self.layup_splines[0] != "'f'":
-                #print("1")
-                self.report.design_errors += "\n"+stre+"\n" 
-            elif self.layup_splines[1] != "'f'":
-                #print("2")
-                self.report.design_errors += "\n"+stre+"\n" 
-            elif self.layup_splines[int(len(self.layup_splines)-1)] != "'f'":
-                #print("3")
-                self.report.design_errors += "\n"+stre+"\n" 
-            elif self.layup_splines[int(len(self.layup_splines)-2)] != "'f'":
-                #print("4")
-                self.report.design_errors += "\n"+stre+"\n" 
+
+            #Loop through CompoST to find "cs.Sequence" objects
+            for co in self.StandardLayup:
+                if type(co) == type(cs.Sequence):
+                    if co.subComponents[0].splineRelimitation.ID != co.subComponents[1].splineRelimitation.ID:
+                        self.report.design_errors += "\n"+stre+"\n" 
+
+                    elif co.subComponents[int(len(co.subComponents)-1)].splineRelimitation.ID != co.subComponents[int(len(co.subComponents)-2)].splineRelimitation.ID:
+                        self.report.design_errors += "\n"+stre+"\n" 
+        #For each sequence
+
+        #
+
+
+
+
+        
+        # stre = "At least the two most external plies shall be continuous. This appears not to be the case.\n"
+        # #avoid duplication
+        # if stre not in self.report.design_errors:
+        #     #Adapted for CompoST
+
+        #     if self.layup_splines[0].ID != self.layup_splines[1].ID:
+        #         self.report.design_errors += "\n"+stre+"\n" 
+
+        #     elif self.layup_splines[int(len(self.layup_splines)-1)].ID != self.layup_splines[int(len(self.layup_splines)-2)].ID:
+                # self.report.design_errors += "\n"+stre+"\n" 
 
 
         return(self)
@@ -560,7 +573,7 @@ class r95(FactBase):
                 cnt = SX.count(sp)
 
                 #if more than one of the same spline delimitation used, and excluding edge of part
-                if (cnt > 1) and (sp != "'f'"):
+                if (cnt > 1) and (sp.memberName != "edge"):
 
                     #excessive count to start
                     min_count = 100
@@ -716,9 +729,6 @@ class r71(FactBase):
                 if stre not in self.report.suggested_checks:
                     self.report.suggested_checks += "\n"+stre+"\n"
 
-
-
-
         return(self)
 
 class r139(FactBase):
@@ -733,48 +743,113 @@ class r139(FactBase):
     def solve(self):
         #Ply drop-offs should not exceed 0.010 inch (0.25mm) thick per drop for unidirectional. 139
         #Ply drop-offs should not exceed  0.015 inch (0.38 mm) thick per drop for fabric. 141
+
+        #Replace convoluted "patches" method with simple read through CompoST
+
+        #for each sequence 
+
+        #create empty "ply + drop-off thickness" dictionary
+        spDict = {}
+        longestSpline = ""
+        longestSplineValue = 0
+
+        for co in self.StandardLayup.allComposite:
+            if type(co) == type(cs.Sequence()):
+
+                #for each ply in sequence
+                for ply in co.subComponents:
+
+                    if type(ply) == type(cs.Ply()):
         
+                    #TODO SplineRelimitationRef is used here - this does not work when splines are stored directly
+                        #if .relimitation in dict
+                        if str(ply.splineRelimitationRef) in spDict.keys():
+                            #add drop off based on layer thickness
+                            #TODO this does not cover for uniform material situation where it is stored in Sequence
+                            spDict[str(ply.splineRelimitationRef)] += float(ply.material.thickness)
+
+                        #if not in dict
+                        else:
+                            #add new entry
+                            spDict[str(ply.splineRelimitationRef)] = float(ply.material.thickness)
+
+                    for g in self.StandardLayup.allGeometry:
+                        if g.ID == ply.splineRelimitationRef:
+                            locLEN = g.length
+                            #TODO what if length does not exist?
+
+                    if locLEN > longestSplineValue:
+                        longestSplineValue = locLEN
+                        longestSpline = str(ply.splineRelimitationRef)
+
         
-        #unique
-        ptch  = []
-        for ls in self.layup_sections:
-            if ls.patch not in ptch:
-                ptch.append(ls.patch)
+        if spDict != {}:
+        
+            #remove edge, as that is technically not drop-off
+            if longestSpline in spDict.keys():
+                del spDict[longestSpline]
+
+            #for each spline check whether drop-offs in limits
+            for k in spDict.keys():
+                if spDict[k] > 0.38:
+                    stre = "Drop-off at one location should not exceed 0.38mm."
+                    stre += "The drop-off is "+str(spDict[k])+"mm at spline ID: "+str(k)+".\n"
+                    #suggested check as it is minor once balance and symmetry has been considered 
+                    #avoid duplication
+                    if stre not in self.report.suggested_checks:
+                        self.report.suggested_checks += "\n"+stre+"\n"
+                    
+                elif spDict[k] > 0.25:
+                    #here suggestion only as not sure if UD
+                    stre = "Drop-off at one location should not exceed 0.25mm for unidirectional and 0.38 for woven fabric."
+                    stre += "The drop-off is "+str(spDict[k])+"mm at spline ID: "+str(k)+".\n"
+                    #suggested check as it is minor once balance and symmetry has been considered 
+                    #avoid duplication
+                    if stre not in self.report.suggested_checks:
+                        self.report.suggested_checks += "\n"+stre+"\n"
+        #if not, print rule with spline name
 
 
-        #assume it is ordered for now
 
-        #self.layup_sections(key=lambda x: x.sp_len)
-        #f = sorted(self.layup_sections, key=self.layup_sections[:].sp_len)#,reverse=True)
-        for ref in ptch:
-            c2 = 0
-            c1 = 0
-            for ls in self.layup_sections:
-                spline_prev = ls.sp_def
-                if c1 != 0:
-                    c2 = c1
-                c1 = ls.local_thickness
-                #spline_prev = ls.sp_def
 
-                if c2 != 0:
-                    dif = abs(c2-c1)
+        # #assume it is ordered for now
+        # #unique
+        # ptch  = []
+        # for ls in self.layup_sections:
+        #     if ls.patch not in ptch:
+        #         ptch.append(ls.patch)
 
-                    if dif > 0.38:
-                        stre = "Drop-off at one location should not exceed 0.38mm."
-                        stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
-                        #suggested check as it is minor once balance and symmetry has been considered 
-                        #avoid duplication
-                        if stre not in self.report.suggested_checks:
-                            self.report.suggested_checks += "\n"+stre+"\n"
+        # #self.layup_sections(key=lambda x: x.sp_len)
+        # #f = sorted(self.layup_sections, key=self.layup_sections[:].sp_len)#,reverse=True)
+        # for ref in ptch:
+        #     c2 = 0
+        #     c1 = 0
+        #     for ls in self.layup_sections:
+        #         spline_prev = ls.sp_def
+        #         if c1 != 0:
+        #             c2 = c1
+        #         c1 = ls.local_thickness
+        #         #spline_prev = ls.sp_def
+
+        #         if c2 != 0:
+        #             dif = abs(c2-c1)
+
+        #             if dif > 0.38:
+        #                 stre = "Drop-off at one location should not exceed 0.38mm."
+        #                 stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
+        #                 #suggested check as it is minor once balance and symmetry has been considered 
+        #                 #avoid duplication
+        #                 if stre not in self.report.suggested_checks:
+        #                     self.report.suggested_checks += "\n"+stre+"\n"
                         
-                    elif dif > 0.25:
-                        #here suggestion only as not sure if UD
-                        stre = "Drop-off at one location should not exceed 0.25mm for unidirectional and 0.38 for woven fabric."
-                        stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
-                        #suggested check as it is minor once balance and symmetry has been considered 
-                        #avoid duplication
-                        if stre not in self.report.suggested_checks:
-                            self.report.suggested_checks += "\n"+stre+"\n"
+        #             elif dif > 0.25:
+        #                 #here suggestion only as not sure if UD
+        #                 stre = "Drop-off at one location should not exceed 0.25mm for unidirectional and 0.38 for woven fabric."
+        #                 stre += "The drop-off is "+str(dif)+"mm at "+str(spline_prev)+".\n"
+        #                 #suggested check as it is minor once balance and symmetry has been considered 
+        #                 #avoid duplication
+        #                 if stre not in self.report.suggested_checks:
+        #                     self.report.suggested_checks += "\n"+stre+"\n"
 
         return(self)
     

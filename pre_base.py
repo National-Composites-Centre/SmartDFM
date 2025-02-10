@@ -5,7 +5,7 @@
 
 from pydantic import BaseModel, Field, conlist,  validator
 import math
-from fact_base import FactBase, layup, hole, vert, material
+from SmartDFM.fact_base import FactBase, layup, hole, vert, material
 import os
 import numpy as np
 #import subprocess
@@ -14,10 +14,10 @@ import os
 import copy
 from scipy import spatial
 #from sfd import WS1
-from step_features import hole_data, flange_data, MR_data
+from SmartDFM.step_features import hole_data, flange_data, MR_data
 
-from CATIA_utils import hole_loc, export_step
-from ED import ED
+from SmartDFM.CATIA_utils import hole_loc, export_step
+from SmartDFM.ED import ED
 
 import CompositeStandard
 
@@ -82,6 +82,7 @@ class p3(FactBase):
         if self.StandardLayup == None:
             try:
                 #Open json file
+                print(self.path+self.part_name+"_layup.json","r")
                 with open(self.path+self.part_name+"_layup.json","r") as in_file:
                     json_str= in_file.read()
                 #use jsonic library to turn into Python objects according to CompositeStandard
@@ -171,16 +172,17 @@ class p5(FactBase):
                     if i.memberName == 'edge':
                         self.edge_points = i.points
                         
-                        ln = 0
-                        for n, ii in enumerate(i.points):
-                            if n > 1:
-                                #addidnt the distance between neighbouring points
-                                ln = ln + math.sqrt((i.points[n].x-i.points[n-1].x)**2+
-                                                    (i.points[n].y-i.points[n-1].y)**2+
-                                                    (i.points[n].z-i.points[n-1].z)**2)
+                    #calculating the lenght of spline
+                    ln = 0
+                    for n, ii in enumerate(i.points):
+                        if n > 1:
+                            #addidnt the distance between neighbouring points
+                            ln = ln + math.sqrt((i.points[n].x-i.points[n-1].x)**2+
+                                                (i.points[n].y-i.points[n-1].y)**2+
+                                                (i.points[n].z-i.points[n-1].z)**2)
 
-                        self.edge_len = ln #TODO delete this, should be sufficient within layup compo-standar
-                        i.length =ln
+                    self.edge_len = ln #TODO delete this, should be sufficient within layup compo-standar
+                    i.length =ln
 
                         #is there a need for 'edge' to still be separate ? #TODO
             self.layup_splines = UniqueSplines
@@ -283,7 +285,7 @@ class p5(FactBase):
                     
                     for ii  in i.subComponents:
                         if ii.material not in w:
-                            w.append(ii.material)
+                            w.append(ii.material.memberName)
             print("w",w)
             ttmax = 0
 
@@ -330,7 +332,7 @@ class p5(FactBase):
 
                                 #find thickness of material layer
                                 for i in self.StandardLayup.allMaterials[:]:
-                                    if i.materialName == w[0]:
+                                    if i.memberName == w[0]:
                                         t_mat = float(i.thickness)
                                         mu = i
                                         #to not run multiple
@@ -347,7 +349,7 @@ class p5(FactBase):
                                 for matName in w:
                                     #find thickness of material layer
                                     for i in self.StandardLayup.allMaterials[:]:
-                                        if i.materialName == matName:
+                                        if i.memberName == matName:
                                             t_mat = float(i.thickness)
                                             mu = i
 
@@ -708,6 +710,8 @@ class p9(FactBase):
         #collect hole data 
         if self.holes[0].radius == None:
             step_file = self.path+self.part_name+".stp"
+            print("Are holes correct?")
+            print(self.holes)
             for h in self.holes:
                 h = hole_data(h,step_file,report = False)
 

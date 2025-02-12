@@ -8,7 +8,7 @@ import math
 from SmartDFM.fact_base import FactBase, layup, report
 from SmartDFM.layup_utils import symmetry, balance
 import numpy as np
-import CompositeStandard as cs
+from CompoST import CompositeStandard as cs
 
 #rXX is an example/template rule, explaining typical features of how the rules are structured
 class rXX(FactBase):

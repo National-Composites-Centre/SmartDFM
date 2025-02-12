@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, conlist
 import numpy as np
 from typing import Optional
 
-import CompositeStandard
+from CompoST import CompositeStandard as cs
 
 #Some of the classes below might be obsolete due to usage of CompositeStandard which houses many of these variables
 

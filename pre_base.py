@@ -19,7 +19,7 @@ from SmartDFM.step_features import hole_data, flange_data, MR_data
 from SmartDFM.CATIA_utils import hole_loc, export_step
 from SmartDFM.ED import ED
 
-import CompositeStandard
+from CompoST import CompositeStandard as cs
 
 from jsonic import deserialize
 
@@ -93,7 +93,7 @@ class p3(FactBase):
                     self.runtime_error = "Layup file not found, or not stored in correct standard."
                 else:
                     self.runtime_error += "Layup file not found, or not stored in correct standard."
-                self.StandardLayup = CompositeStandard.CompositeDB(BaseModel) #empty layup when layup missing
+                self.StandardLayup = cs.CompositeDB(BaseModel) #empty layup when layup missing
                 #TODO Fix the exception run!!
 
             self.ite += 1  
@@ -114,7 +114,7 @@ class p4(FactBase):
             allS = [] #all splines
             #assuming all plies from same stack - and ordered reasonably
             for i in self.StandardLayup.allComposite[:]:
-                if type(i) == type(CompositeStandard.Sequence()):
+                if type(i) == type(cs.Sequence()):
                     for ii  in i.subComponents:
                         s.append(ii.orientation)
                         #accomodate for piece provided under ply
@@ -124,7 +124,7 @@ class p4(FactBase):
                         ID = ii.splineRelimitationRef
                         IDfound = False
                         for c in self.StandardLayup.allGeometry:
-                            if type(c) == type(CompositeStandard.Spline()):
+                            if type(c) == type(cs.Spline()):
 
                                 if c.ID == ID:
                                     allS.append(c.memberName)
@@ -166,7 +166,7 @@ class p5(FactBase):
             #save edge spline
             UniqueSplines = []
             for i in self.StandardLayup.allGeometry[:]:
-                if type(i) == type(CompositeStandard.Spline()):
+                if type(i) == type(cs.Spline()):
                     UniqueSplines.append(i)
 
                     if i.memberName == 'edge':
@@ -280,7 +280,7 @@ class p5(FactBase):
             w = []
 
             for i in self.StandardLayup.allComposite[:]:
-                if type(i) == type(CompositeStandard.Sequence()):
+                if type(i) == type(cs.Sequence()):
                     #TODO check if sequence has materials locally defined as list
                     
                     for ii  in i.subComponents:

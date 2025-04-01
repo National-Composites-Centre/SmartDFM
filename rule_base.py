@@ -32,6 +32,7 @@ class rXX(FactBase):
             #features are being checked for the rule.
             if txt not in self.report.design_errors:
                 self.report.design_errors = self.report.design_errors + txt 
+                self.report.de_count += 1
 
         #print("r85 checked")
         return(self)
@@ -53,6 +54,7 @@ class r85(FactBase):
             #avoid duplication
             if txt not in self.report.design_errors:
                 self.report.design_errors = self.report.design_errors + txt 
+                self.report.de_count += 1
 
         #print("r85 checked")
         return(self)
@@ -80,6 +82,7 @@ class r86(FactBase):
                     #avoid duplication
                     if txt not in self.report.design_errors: 
                         self.report.design_errors = self.report.design_errors + txt 
+                        self.report.de_count += 1
 
             elif self.tool_gender == None:
                 if self.min_major_radii < self.layup_max_thickness+2:
@@ -89,6 +92,7 @@ class r86(FactBase):
                     #avoid duplication
                     if txt not in self.report.design_errors:
                         self.report.design_errors = self.report.design_errors + txt 
+                        self.report.de_count += 1
 
 
             else:
@@ -119,6 +123,7 @@ class r91(FactBase):
                 #avoid duplication
                 if txt not in self.report.suggested_checks:
                     self.report.suggested_checks += txt
+                    self.report.sc_count += 1
 
         return(self)
 
@@ -144,6 +149,7 @@ class r92(FactBase):
                 #avoid duplication
                 if txt not in self.report.suggested_checks:
                     self.report.suggested_checks += txt
+                    self.report.sc_count += 1
 
         return(self)
 
@@ -176,6 +182,7 @@ class r134(FactBase):
                     #avoid duplication
                     if txt not in self.report.suggested_checks:
                         self.report.suggested_checks += txt
+                        self.report.sc_count += 1
                     break
 
         #add clauses for less than 4 but stacking.. suggestion to spread them out
@@ -207,6 +214,7 @@ class r135(FactBase):
                     txt += "This should be avoided, place differently oriented plies between the 90 degree plies.\n"
                     if txt not in self.report.suggested_checks:
                         self.report.suggested_checks += txt
+                        self.report.sc_count += 1
                     break
 
         return(self)    
@@ -235,6 +243,7 @@ class r130(FactBase):
                 txt += "ideally make all local sections symmetric.\n."
                 if txt not in self.report.warnings:
                     self.report.warnings = self.report.warnings+txt
+                    self.report.wa_count += 1
 
 
         for i in self.layup_sections:
@@ -248,6 +257,7 @@ class r130(FactBase):
                 #avoid duplication
                 if txt not in self.report.warnings:
                     self.report.warnings = self.report.warnings+txt
+                    self.report.wa_count += 1
 
                 #eventually distinugish between full stack balance and all segments balance
                 #break
@@ -286,6 +296,7 @@ class r144(FactBase):
                     #avoid duplication
                     if txt not in self.report.warnings:
                         self.report.warnings =self.report.warnings + txt
+                        self.report.wa_count += 1
 
         return(self)
 
@@ -317,6 +328,7 @@ class r35(FactBase):
                         #avoid duplication
                         if stre not in self.report.design_errors:
                             self.report.design_errors += "\n"+ stre +"\n"    
+                            self.report.de_count += 1
         
 
         return(self)
@@ -356,6 +368,7 @@ class r166(FactBase):
                 #avoid duplication
                 if stre not in self.report.design_errors:
                     self.report.design_errors += "\n"+stre+"\n"
+                    self.report.de_count += 1
 
         return(self)
 
@@ -386,6 +399,7 @@ class r151(FactBase):
                 #avoid duplication
                 if stre not in self.report.suggested_checks:
                     self.report.suggested_checks += "\n"+stre+"\n"
+                    self.report.sc_count += 1
                 #only takes one instance of this to be included in suggestions
                 break
 
@@ -423,13 +437,15 @@ class r36(FactBase):
                     #avoid duplication
                     if stre not in self.report.warnings:
                         self.report.warnings += "\n"+stre+"\n"
+                        self.report.wa_count += 1
                 elif (0.8 > dt ) or (dt > 1.2):
                     stre = "Bolt diameter to laminate thickness ratio (d/t) should be around 1.\n"
                     stre += "This ratio is "+str(dt)+" at the hole location "+str(h.position)+".\n"
                     stre += "Consider adjust this if this hole is used for bolted connection.\n"
                     #avoid duplication
                     if stre not in self.report.suggested_checks:
-                        self.report.suggested_checks += "\n"+stre+"\n"        
+                        self.report.suggested_checks += "\n"+stre+"\n"  
+                        self.report.sc_count += 1      
 
         #print("temp... delete later")
 
@@ -469,6 +485,7 @@ class r78(FactBase):
                 #avoid duplication
                 if stre not in self.report.warnings:
                     self.report.warnings += "\n"+stre+"\n"
+                    self.report.wa_count += 1
                 
         return(self)
 
@@ -498,6 +515,7 @@ class r133(FactBase):
                         #avoid duplication
                         if stre not in self.report.suggested_checks:
                             self.report.suggested_checks += "\n"+stre+"\n" 
+                            self.report.sc_count += 1
 
 
         return(self)
@@ -521,9 +539,11 @@ class r83(FactBase):
                 if type(co) == type(cs.Sequence):
                     if co.subComponents[0].splineRelimitation.ID != co.subComponents[1].splineRelimitation.ID:
                         self.report.design_errors += "\n"+stre+"\n" 
+                        self.report.de_count += 1
 
                     elif co.subComponents[int(len(co.subComponents)-1)].splineRelimitation.ID != co.subComponents[int(len(co.subComponents)-2)].splineRelimitation.ID:
                         self.report.design_errors += "\n"+stre+"\n" 
+                        self.report.de_count += 1
         #For each sequence
 
         #
@@ -599,12 +619,14 @@ class r95(FactBase):
                         #avoid duplication
                         if stre not in self.report.warnings:
                             self.report.warnings += "\n"+stre+"\n"
+                            self.report.wa_count += 1
                     else:
                         if reported == 0:
                             stre = "Dropping several plies at the same position is not recommended for drop offs with ramp in only one side.\n"
                             #avoid duplication
                             if stre not in self.report.suggested_checks:
                                 self.report.suggested_checks += "\n"+stre+"\n" 
+                                self.report.sc_count += 1
                             reported += 1
 
         return(self)
@@ -638,6 +660,7 @@ class r128(FactBase):
                         #avoid duplication
                         if stre not in self.report.design_errors:
                             self.report.design_errors += "\n"+stre+"\n" 
+                            self.report.de_count += 1
                         break
                     i = i + 1
 
@@ -682,6 +705,7 @@ class r146(FactBase):
                 #avoid duplication
                 if stre not in self.report.suggested_checks:
                     self.report.suggested_checks += "\n"+stre+"\n"
+                    self.report.sc_count += 1
             
             if sm45_1 != sm45_2:
                 stre = "In areas of load introduction there should be equal numbers of +45° and -45° plies on each side of the mid-plane."
@@ -689,6 +713,7 @@ class r146(FactBase):
                 #avoid duplication
                 if stre not in self.report.suggested_checks:
                     self.report.suggested_checks += "\n"+stre+"\n"
+                    self.report.sc_count += 1
 
         return(self)
 
@@ -728,6 +753,7 @@ class r71(FactBase):
                 #avoid duplication
                 if stre not in self.report.suggested_checks:
                     self.report.suggested_checks += "\n"+stre+"\n"
+                    self.report.sc_count += 1
 
         return(self)
 
@@ -798,6 +824,7 @@ class r139(FactBase):
                     #avoid duplication
                     if stre not in self.report.suggested_checks:
                         self.report.suggested_checks += "\n"+stre+"\n"
+                        self.report.sc_count += 1
                     
                 elif spDict[k] > 0.25:
                     #here suggestion only as not sure if UD
@@ -807,6 +834,7 @@ class r139(FactBase):
                     #avoid duplication
                     if stre not in self.report.suggested_checks:
                         self.report.suggested_checks += "\n"+stre+"\n"
+                        self.report.sc_count += 1
         #if not, print rule with spline name
 
 
@@ -876,6 +904,7 @@ class r400(FactBase):
             #avoid duplication
             if stre not in self.report.suggested_checks:
                 self.report.suggested_checks += stre
+                self.report.sc_count += 1
         
         return(self)
 
@@ -931,6 +960,7 @@ class r401(FactBase):
             #avoid duplication
             if stre not in self.report.suggested_checks:
                 self.report.suggested_checks += stre
+                self.report.sc_count += 1
         #Potentially fix: this sometimes considers other side of same radius different radius
         #^^ add a proximity fileter?
         #print(self.uniform_material, "uniform material")
@@ -974,6 +1004,7 @@ class r402(FactBase):
                 #if so, instruct to check and give link to attenuation charts 
                 if GFRP > 1:
                     self.report.warnings += stre
+                    self.report.wa_count += 1
                     break
                 
 

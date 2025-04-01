@@ -54,6 +54,9 @@ class report(BaseModel):
     design_errors: str = Field("\n             DESIGN ERRORS: \n") #user must address this
     suggested_checks: str = Field("\n             SUGGESTED CHECKS: \n") #only informs user, might not need to be actioned
     check_issues: str = Field("\n              DESIGN CHECK ISSUES: \n") #notes on what check was skipped
+    wa_count: int = Field(default=0) 
+    de_count: int = Field(default=0)
+    sc_count: int = Field(default=0)
 
 class FactBase(BaseModel):
     """

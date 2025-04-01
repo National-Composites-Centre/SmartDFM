@@ -27,12 +27,15 @@ def sDFM(part,location,extension=""):
     d.part_name =  part #self.lfn.text
     ptemp = location
     ptemp = ptemp.replace("/","\\")+"\\"
+    ptemp = ptemp.replace("\\\\","\\")
     d.path = ptemp
 
     p = pre_base
 
     #bit cured #TODO make this auto generate?
-    active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p10,p.p11,p.p12,p.p14,p.p15,p.p16] 
+    #active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p8,p.p10,p.p11,p.p12,p.p14,p.p15,p.p16] 
+    #for CORE project limit
+    active_pre = [p.p3,p.p4,p.p5,p.p6,p.p7,p.p10,p.p11,p.p12,p.p15] 
 
     #p9 --- holes now disabled -- not expected in the part in question (CORE only)
 
@@ -46,10 +49,12 @@ def sDFM(part,location,extension=""):
 
     #these rules are numbered according ty Bryn's design rules document
     r = rule_base
-    #active_rules =  [r.r35,r.r36,r.r71,r.r83,r.r85,r.r86,r.r91,r.r92,r.r95,r.r128,r.r133,r.r134,r.r135,r.r130,r.r139,r.r144,r.r146,r.r151,r.r166,r.r400,r.r401,r.r402]
-    active_rules =  [r.r139]
+    active_rules =  [r.r35,r.r36,r.r71,r.r83,r.r85,r.r86,r.r91,r.r92,r.r95,r.r128,r.r133,r.r134,r.r135,r.r130,r.r139,r.r144,r.r146,r.r151,r.r166,r.r400,r.r401,r.r402]
+    #active_rules =  [r.r139]
 
     #78 temporarily disabled
+
+    #print("CHECK report counters initiated:",d.report)
 
     #runs until rules dont make any change to fact base
     #for now just run once....
@@ -74,11 +79,11 @@ def sDFM(part,location,extension=""):
                 d = i(d).solve()
         
             except ValidationError as e:
-                print(e)
+                #print(e)
                 pass
             p = 1
         
-        print("d.ite",d.ite)
+        #print("d.ite",d.ite)
 
     #Rules running only once, rule results are text, should not affect the ability of other rules to be checked.
     #temp:
@@ -93,19 +98,19 @@ def sDFM(part,location,extension=""):
 
             #is this too brute force ?
 
-            # try:
-            #     try:
-            d = i(d).solve()
+            try:
+                try:
+                    d = i(d).solve()
 
-            #     except ValidationError as e:
+                except ValidationError as e:
                     
-            #         stre = "Rule "+str(i)+" not checked due to missing information."
-            #         d.report.check_issues += "\n"+stre +"\n"
+                    stre = "Rule "+str(i)+" not checked due to missing information."
+                    d.report.check_issues += "\n"+stre +"\n"
             
-            # except Exception as er:
+            except Exception as er:
                 
-            #     stre = "Rule "+str(i)+" not checked due to DFM tool error."
-            #     d.report.check_issues += "\n"+stre +"\n"
+                stre = "Rule "+str(i)+" not checked due to DFM tool error."
+                d.report.check_issues += "\n"+stre +"\n"
                 
     t1_stop = perf_counter()
     lapsed = t1_stop-t1_start
@@ -116,13 +121,14 @@ def sDFM(part,location,extension=""):
                         "\n This report is also availble at "+d.path+" as a .txt file"+\
                             "\n"+"\nSmartDFM "+d.version+"\n\n"+"Design was checked in "+str(lapsed)+" seconds."
 
-    print(d.report.design_errors)
-    print(d.report.warnings)
-    print(d.report.suggested_checks)
+    #print(d.report.design_errors)
+    #print(d.report.warnings)
+    #print(d.report.suggested_checks)
 
     f = open(d.path+d.part_name+"_report.txt", "w")
     f.write(d.report.design_errors+d.report.warnings+d.report.suggested_checks+d.report.check_issues+"\n"+"\nSmartDFM "+d.version)
     f.close()
 
+    return(total_report,d.report.de_count,d.report.wa_count,d.report.sc_count)
 
 

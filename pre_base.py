@@ -82,8 +82,9 @@ class p3(FactBase):
         if self.StandardLayup == None:
             try:
                 #Open json file
-                print(self.path+self.part_name+"_layup.json","r")
-                with open(self.path+self.part_name+"_layup.json","r") as in_file:
+                #TEMPORARILY removed _layup from the file name, for CORE project
+                print(self.path+self.part_name+".json","r")
+                with open(self.path+self.part_name+".json","r") as in_file:
                     json_str= in_file.read()
                 #use jsonic library to turn into Python objects according to CompositeStandard
                 self.StandardLayup = deserialize(json_str,string_input=True)
@@ -93,7 +94,7 @@ class p3(FactBase):
                     self.runtime_error = "Layup file not found, or not stored in correct standard."
                 else:
                     self.runtime_error += "Layup file not found, or not stored in correct standard."
-                self.StandardLayup = cs.CompositeDB(BaseModel) #empty layup when layup missing
+                self.StandardLayup = cs.CompositeDB() #empty layup when layup missing
                 #TODO Fix the exception run!!
 
             self.ite += 1  
@@ -165,8 +166,20 @@ class p5(FactBase):
 
             #save edge spline
             UniqueSplines = []
+
+            #previously worked with all splines -- not good due to other stored information
+            
+            #New method to find sequence, and idenify unique delimitations
+
+            uniqueID = []
+            for C in self.StandardLayup.allComposite:
+                if type(C) == type(cs.Sequence):
+                    for P in C.subComponents:
+                        if P.splineRelimitationRef not in uniqueID:
+                            uniqueID.append(P.splineRelimitationRef)
+
             for i in self.StandardLayup.allGeometry[:]:
-                if type(i) == type(cs.Spline()):
+                if type(i) == type(cs.Spline()) and (i.ID in uniqueID):
                     UniqueSplines.append(i)
 
                     if i.memberName == 'edge':
@@ -235,7 +248,9 @@ class p5(FactBase):
 
                             min_dist = 90000000000
                             iii = 0
-                            while iii < np.size(last_patch[0].pt_list,0):
+
+                            #Potentially issues? TODO check. last_patch.pt_list was replaced as limit in while loop by pt_list
+                            while iii < (np.size(pt_list,0)-1):
                                 dd = math.sqrt((A[0]-pt_list[iii,0])**2+(A[1]-pt_list[iii,1])**2+(A[2]-pt_list[iii,2])**2)
                                 if dd < min_dist:
                                     min_dist = dd
@@ -244,7 +259,7 @@ class p5(FactBase):
                             max_dist = 0
                             iii = 0
 
-                            while iii < np.size(last_patch[0].pt_list,0):
+                            while iii < np.size(np.size(pt_list,0)-1):
                                 dd = math.sqrt((B[0]-pt_list[iii,0])**2+(B[1]-pt_list[iii,1])**2+(B[2]-pt_list[iii,2])**2)
                                 if dd > max_dist:
                                     max_dist = dd
@@ -284,13 +299,12 @@ class p5(FactBase):
                     #TODO check if sequence has materials locally defined as list
                     
                     for ii  in i.subComponents:
-                        if ii.material not in w:
+                        if ii.material.memberName not in w:
                             w.append(ii.material.memberName)
-            print("w",w)
+            
             ttmax = 0
 
             mpl = self.max_ply_layup
-
 
             for ii, patch in enumerate(patches):
                 #reverse the order 
@@ -428,11 +442,13 @@ class p6(FactBase):
                             sls1.append(p1)
                         else:
                             self.layup_sections[i].overlap = True
+
                     
                     if len(sls1) == 0:
                         #if no points were stored it means edge spline is the spline
                         #in such case the spline is kept in full
                         sls1 = self.layup_sections[i].pt_list
+
 
                     #remove edge points from second spline list
                     sls2 = []
@@ -446,13 +462,17 @@ class p6(FactBase):
                             sls2.append(p1)
                         else:
                             self.layup_sections[ii].overlap = True
+
+                    
                     
                     if len(sls2) == 0:
                         #if no points were stored it means edge spline is the spline
                         #in such case the spline is kept in full
                         sls2 = self.layup_sections[ii].pt_list
 
+
                     #CURRENTLY ISSUE WITH WORKING WITH ONE SPLINE ONLY --- DONT THINK IT HAS A WAY OF CALCULATING DISTANCE...
+
 
                     for p1 in sls1:
                         for p2 in sls2:
@@ -462,11 +482,14 @@ class p6(FactBase):
                                 i_id = ii
                                 change = change + 1
 
+                            
+
                     ii = ii + 1
 
                 if change > 0:
                     self.layup_sections[i].mind = mind
                     self.layup_sections[i].close_other = self.layup_sections[i_id].sp_def
+
                 
                     #if this is also the closest for the other spline
                     if mind < self.layup_sections[i_id].mind:
@@ -479,7 +502,6 @@ class p6(FactBase):
                 #re-run of p6
                 self.layup_sections[i].mind = 999 # high number to prevent triggering r144
 
-            print("p6 run")
             self.ite += 1
 
         return(self)
@@ -555,7 +577,7 @@ class p8(FactBase):
                 run_path = os.path.dirname(os.path.realpath(__file__))+'''\\WS_2.0\\'''
                 path = self.path
                 command = '''conda run -n GPU_WS_pyg_retest python '''+run_path+'''single_file_demonstrator.py '''
-                command += '''--file_path "'''+path+part_name+'''".stp --out_path "'''
+                command += '''--file_path "'''+self.step_file+'''" --out_path "'''
                 command += run_path+'''votes_h" --config_path "'''+run_path+'''config_sursol.ini"'''
                 process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
 
@@ -709,9 +731,9 @@ class p9(FactBase):
     def solve(self):
         #collect hole data 
         if self.holes[0].radius == None:
-            step_file = self.path+self.part_name+".stp"
-            print("Are holes correct?")
-            print(self.holes)
+            step_file = self.step_file
+            #print("Are holes correct?")
+            #print(self.holes)
             for h in self.holes:
                 h = hole_data(h,step_file,report = False)
 
@@ -788,6 +810,12 @@ class p11(FactBase):
 
             if os.path.exists(self.path+self.part_name+".stp"):
                 self.step_file = self.path+self.part_name+".stp"
+
+            #FOR CORE - sometimes same step is used for many layups
+            elif os.path.exists(self.path+self.part_name.split("---")[0]+".stp"):
+                print("YES, the short STEP was used")
+                self.step_file =  self.path+self.part_name.split("---")[0]+".stp"
+
             else:
                 #if step file does not exist, create a step file
                 if self.refFileExt == "CATPart":
@@ -898,7 +926,7 @@ class p14(FactBase):
             run_path = os.path.dirname(os.path.realpath(__file__))+'''\\WS_2.0\\'''
             path = self.path
             command = '''conda run -n GPU_WS_pyg_retest python '''+run_path+'''single_file_demonstrator.py '''
-            command += '''--file_path "'''+path+part_name+'''".stp --out_path "'''
+            command += '''--file_path "'''+self.step_file+'''" --out_path "'''
             command += run_path+'''votes_mr" --config_path "'''+run_path+'''config_rad.ini"'''
             print(command)
             process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
@@ -952,7 +980,7 @@ class p15(FactBase):
 
         #step interogation based on points provided by WS
         if self.min_major_radii == None:
-            sf = self.path + self.part_name+".stp"
+            sf = self.step_file
             rad, mmr, CIRCs = MR_data(sf,self.MR_points)
             self.mmr_location = mmr
             self.min_major_radii = rad
@@ -978,7 +1006,7 @@ class p16(FactBase):
             run_path = os.path.dirname(os.path.realpath(__file__))+'''\\WS_2.0\\'''
             path = self.path
             command = '''conda run -n GPU_WS_pyg_retest python '''+run_path+'''single_file_demonstrator.py '''
-            command += '''--file_path "'''+path+part_name+'''".stp --out_path "'''
+            command += '''--file_path "'''+self.step_file+'''" --out_path "'''
             command += run_path+'''votes_fl" --config_path "'''+run_path+'''config_fl.ini"'''
             process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
 

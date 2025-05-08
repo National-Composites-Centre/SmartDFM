@@ -132,3 +132,6 @@ def sDFM(part,location,extension=""):
     return(total_report,d.report.de_count,d.report.wa_count,d.report.sc_count)
 
 
+# location = "C:\\analyticalmethods_coreblade\\OptimisationRuns"
+# part = "ABS008---0000---"
+# sDFM(part,location)

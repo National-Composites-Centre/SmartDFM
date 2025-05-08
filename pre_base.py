@@ -81,8 +81,8 @@ class p3(FactBase):
 
         if self.StandardLayup == None:
             try:
-                #Open json file
-                #TEMPORARILY removed _layup from the file name, for CORE project
+                    #Open json file
+                    #TEMPORARILY removed _layup from the file name, for CORE project
                 print(self.path+self.part_name+".json","r")
                 with open(self.path+self.part_name+".json","r") as in_file:
                     json_str= in_file.read()
